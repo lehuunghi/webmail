@@ -6,8 +6,8 @@ duy trì mã nguồn tại [lehuunghi/webmail](https://github.com/lehuunghi/webm
 - **Tiếng Việt:** là ngôn ngữ mặc định ngay ở màn hình đăng nhập; có thể đổi trong
   **Settings → Appearance → Interface language**. Bản dịch gồm thư, lịch, danh bạ,
   tệp, cài đặt và quyền quản trị. Beta cho đến khi được người bản ngữ duyệt.
-- **Giao diện Webmail:** nền sáng, thanh tìm kiếm bo tròn, nút Soạn thư xanh nhạt,
-  danh sách thư toàn chiều rộng, hỗ trợ cả chế độ tối và màn hình nhỏ.
+- **Giao diện Webmail:** nền sáng, các khung và nút góc vuông, nút Soạn thư xanh nhạt,
+  danh sách thư toàn chiều rộng, hỗ trợ cả chế độ tối và màn hình nhỏ. Thanh Thư / Lịch / Danh bạ / Tệp gọn hơn, chữ 12px và icon 22px rõ nét.
 - Người dùng mới mặc định dùng chủ đề **Webmail**, chế độ sáng và ẩn ngăn đọc.
   Tài khoản đã lưu cài đặt vẫn giữ lựa chọn cũ; vào **Settings → Appearance**
   chọn **Webmail / Light**, và **General → Reading pane → Off** nếu muốn bố cục mới.

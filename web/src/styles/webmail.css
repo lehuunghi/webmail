@@ -3,6 +3,9 @@
 :root[data-palette="webmail"] {
   --topbar-h: 64px;
   --font-sans: Arial, "Noto Sans", system-ui, sans-serif;
+  --radius: 0px;
+  --radius-sm: 0px;
+  --radius-lg: 0px;
   --bg: #f6f8fc;
   --bg-elev: #ffffff;
   --bg-sunken: #eaf1fb;
@@ -52,15 +55,15 @@
 :root[data-palette="webmail"] .topbar .brand { font-size: 22px; font-weight: 400; }
 :root[data-palette="webmail"] .topbar .brand .brand-name { color: var(--fg-muted); }
 :root[data-palette="webmail"] .searchbar { margin-left: 16px; }
-:root[data-palette="webmail"] .searchbar .search-input { height: 48px; border-radius: 24px; border-color: transparent; }
+:root[data-palette="webmail"] .searchbar .search-input { height: 48px; border-radius: 0; border-color: transparent; }
 :root[data-palette="webmail"] .searchbar .search-input:focus-within { background: var(--bg-elev); box-shadow: var(--shadow-1); }
-:root[data-palette="webmail"] .compose-btn { align-self: flex-start; height: 56px; padding-inline: 20px 24px; background: var(--webmail-compose-bg); color: var(--webmail-compose-fg); box-shadow: none; }
+:root[data-palette="webmail"] .compose-btn { align-self: flex-start; height: 48px; padding-inline: 16px 20px; background: var(--webmail-compose-bg); color: var(--webmail-compose-fg); box-shadow: none; }
 :root[data-palette="webmail"] .compose-btn svg { color: inherit; }
 :root[data-palette="webmail"] .compose-btn:hover { box-shadow: var(--shadow-2); }
 :root[data-palette="webmail"] .nav-section { text-transform: none; letter-spacing: 0; font-size: .85em; font-weight: 500; color: var(--fg-muted); padding-top: 16px; }
-:root[data-palette="webmail"] .nav-item { height: 34px; }
+:root[data-palette="webmail"] .nav-item { height: 32px; font-size: 14px; }
 :root[data-palette="webmail"] .module-bar { border-top: 0; gap: 4px; }
-:root[data-palette="webmail"] .module-link { border-radius: 16px; }
+:root[data-palette="webmail"] .module-link { border-radius: 0; }
 :root[data-palette="webmail"] .main { border: 0; }
 :root[data-palette="webmail"] .msg-row .msg-check { opacity: .65; }
 :root[data-palette="webmail"] .msg-row.selected .msg-check,
@@ -71,12 +74,12 @@
 :root[data-palette="webmail"] .thread-subject h1 { font-size: 1.55em; font-weight: 400; }
 :root[data-palette="webmail"] .composer-head { background: var(--bg-sunken); color: var(--fg); }
 :root[data-palette="webmail"] .composer-field > label { width: 58px; }
-:root[data-palette="webmail"] .fab { background: var(--webmail-compose-bg); color: var(--webmail-compose-fg); border-radius: 16px; }
+:root[data-palette="webmail"] .fab { background: var(--webmail-compose-bg); color: var(--webmail-compose-fg); border-radius: 0; }
 @media (min-width: 769px) {
   :root[data-palette="webmail"] .app-body { padding: 0 16px 16px 0; }
-  :root[data-palette="webmail"] .main { border-radius: 16px; }
+  :root[data-palette="webmail"] .main { border-radius: 0; }
   :root[data-palette="webmail"] .collapsed .compose-btn { padding: 0; align-self: auto; }
-  :root[data-palette="webmail"] .list-toolbar { min-height: 52px; }
+  :root[data-palette="webmail"] .list-toolbar { min-height: 44px; }
 }
 @media (max-width: 768px) {
   :root[data-palette="webmail"] .topbar { gap: 6px; padding-inline: 8px; }
@@ -86,4 +89,26 @@
 }
 @media print {
   :root[data-palette="webmail"] .app-body { padding: 0; }
+}
+
+/* Compact workspace rail and square surfaces requested for this deployment. */
+:root[data-palette="webmail"] .workspace-rail { gap: 2px; padding: 8px 4px; background: var(--bg-sunken); }
+:root[data-palette="webmail"] .workspace-rail .module-link { width: 56px; height: 52px; gap: 2px; padding: 4px 0; font-size: 12px; font-weight: 500; color: var(--fg); }
+:root[data-palette="webmail"] .workspace-rail .module-link svg { width: 22px; height: 22px; padding: 3px 10px; border-radius: 0; stroke-width: 2.2; }
+:root[data-palette="webmail"] .workspace-rail .module-link.active { font-weight: 600; color: var(--accent-soft-fg); }
+:root[data-palette="webmail"] .workspace-rail .module-link .module-label { line-height: 16px; }
+:root[data-palette="webmail"] :is(.workspace-rail, .mobile-workspace-nav, .mobile-tabbar) svg { opacity: 1; filter: none; }
+:root[data-palette="webmail"] :is(.btn, .btn-pill, .icon-btn, .compose-btn, .nav-item, .chip, .tag, .badge, .kbd, .tooltip, .skeleton, .toast-action, .toast-close, .chip-x, .search-panel, .composer, .reply-box, .reply-prompt button, .attachment, .att-icon, .att-progress, .attachment-chip, .selection-bar, .mode-switch, .segmented, .msg-star, .quote-toggle) { border-radius: 0; }
+:root[data-palette="webmail"] .gmail-login :is(.login-card, .input, .btn, select) { border-radius: 0; }
+:root[data-palette="webmail"] .msg-row { font-size: 14px; }
+@media (min-width: 769px) {
+  :root[data-palette="webmail"] .msg-row .msg-subject { min-width: 0; max-width: 65%; }
+}
+@media (max-width: 768px) {
+  :root[data-palette="webmail"] .mobile-workspace-nav { gap: 0; padding-inline: 0; }
+  :root[data-palette="webmail"] .mobile-workspace-nav .module-link { height: 52px; gap: 3px; padding: 6px 2px; border-radius: 0; font-size: 12px; font-weight: 500; color: var(--fg); }
+  :root[data-palette="webmail"] .mobile-workspace-nav .module-link.active { color: var(--accent-soft-fg); font-weight: 600; }
+  :root[data-palette="webmail"] :is(.mobile-workspace-nav, .mobile-tabbar) svg { width: 22px; height: 22px; stroke-width: 2.2; }
+  :root[data-palette="webmail"] .mobile-tabbar a { font-size: 12px; font-weight: 500; color: var(--fg); gap: 3px; }
+  :root[data-palette="webmail"] .mobile-tabbar a.active { color: var(--accent); font-weight: 600; }
 }
