@@ -21,7 +21,7 @@ describe("the served HTML", () => {
     // jsdom rewrites import.meta.url to an http URL, so resolve from the
     // Vite root instead of relative to this file.
     const html = readFileSync(resolve(process.cwd(), "index.html"), "utf8");
-    expect(html).toMatch(/<html[^>]*\slang="en"/);
+    expect(html).toMatch(/<html[^>]*\slang="vi"/);
   });
 });
 
@@ -42,7 +42,7 @@ describe("applyLang", () => {
     }
   });
 
-  it("falls back to English rather than claiming a language it cannot render", () => {
+  it("falls back to Vietnamese rather than claiming a language it cannot render", () => {
     /*
      * The tag is derived, not written down. Naming a real language here means
      * the test breaks the day that language ships -- which it did, twice, for
@@ -52,7 +52,7 @@ describe("applyLang", () => {
     const unshipped = ["cy", "is", "mt", "eu"].find((tag) => !UI_LANGUAGES.some((l) => l.tag === tag));
     expect(unshipped).toBeDefined();
     applyLang({ ...DEFAULT_SETTINGS, uiLanguage: unshipped! });
-    expect(document.documentElement.lang).toBe("en");
+    expect(document.documentElement.lang).toBe("vi");
   });
 
   it("is applied from the module the app imports before it renders", async () => {
@@ -65,6 +65,6 @@ describe("applyLang", () => {
     document.documentElement.removeAttribute("lang");
     vi.resetModules();
     await import("@/store/settings");
-    expect(document.documentElement.lang).toBe("en");
+    expect(document.documentElement.lang).toBe("vi");
   });
 });

@@ -40,7 +40,7 @@ export interface PaletteMeta {
 export const PALETTES: PaletteMeta[] = [
   { id: "webmail", name: "Webmail" },
   { id: "default", name: "Classic", translatable: true },
-  { id: "ihasmail", name: "ihasmail" },
+  { id: "ihasmail", name: "Ocean" },
   { id: "dracula", name: "Dracula", credit: "Dracula Theme (MIT) — dark: Dracula, light: Alucard" },
   { id: "gruvbox", name: "Gruvbox", credit: "gruvbox by morhetz (MIT)" },
   { id: "rose-pine", name: "Rosé Pine", credit: "Rosé Pine (MIT) — light variant is Dawn" },

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hướng dẫn cài đặt · Webmail</title><link rel="stylesheet" href="huong-dan.css"></head>
+<body><header><a href="./">← Webmail</a><span>Phiên bản của lehuunghi</span></header><main><nav aria-label="Mục lục"><a href="#docker">Docker</a><a href="#portainer">Portainer</a><a href="#cpanel">cPanel</a></nav><h1>Cài đặt Webmail của lehuunghi</h1>
+<p>Mã nguồn: <a href="https://github.com/lehuunghi/webmail">https://github.com/lehuunghi/webmail</a>. Giao diện mới mặc định là tiếng Việt; lựa chọn ngôn ngữ đã lưu của người dùng vẫn được giữ. Có thể đổi tên bằng <code>APP_NAME</code>. Đây là <strong>ứng dụng đọc thư JMAP</strong>, cần máy chủ <strong>Stalwart 0.16 trở lên</strong> đang hoạt động. Nó không tự cung cấp SMTP, IMAP hay tạo hộp thư. Tạo tài khoản, tên miền và DNS gửi/nhận thư trên Stalwart trước.</p>
+<h2>1. Chuẩn bị chung</h2>
+<ul>
+<li>Tên miền giao diện, ví dụ <code>webmail.example.com</code>, trỏ đến máy chạy ứng dụng.</li>
+<li>Địa chỉ Stalwart, ví dụ <code>https://mail.example.com</code>, có chứng chỉ TLS hợp lệ. Từ máy chạy Webmail phải truy cập được <code>https://mail.example.com/.well-known/jmap</code>.</li>
+<li>HTTPS cho giao diện (AutoSSL cPanel hoặc reverse proxy Caddy/Nginx). Khi đặt <code>TRUST_PROXY=1</code>, cookie đăng nhập yêu cầu HTTPS.</li>
+<li>Tạo bí mật riêng bằng <code>openssl rand -base64 48</code>. Giữ nguyên bí mật khi cập nhật; không đưa <code>.env</code> vào Git.</li>
+<li>Máy build cần Node.js <strong>22.12 trở lên hoặc 24 LTS</strong> và npm. Chỉ thỏa <code>&gt;=20.19</code> trong package.json chưa đủ cho các công cụ build hiện tại. Dockerfile sử dụng Node 26.</li>
+<li>Nếu dùng đường dẫn <code>/mail</code> thay vì tên miền riêng: đặt <code>BASE_PATH=/mail</code> <strong>cả lúc build và lúc chạy</strong>, reverse proxy giữ nguyên tiền tố. Các ví dụ dưới đây dùng tên miền riêng ở đường dẫn <code>/</code>.</li>
+</ul>
+<h2 id="docker">2. Docker riêng: build từ repo của bạn</h2>
+<p>Trên VPS Linux đã cài Docker Engine và Compose plugin:</p>
+<pre><code class="language-sh">git clone https://github.com/lehuunghi/webmail.git
+cd webmail
+cp .env.example .env
+openssl rand -base64 48
+</code></pre>
+<p>Sửa <code>.env</code>, tối thiểu:</p>
+<pre><code class="language-dotenv">STALWART_URL=https://mail.example.com
+APP_SECRET=THAY_BANG_BI_MAT_VUA_TAO
+APP_NAME=Webmail
+SOURCE_URL=https://github.com/lehuunghi/webmail
+TRUST_PROXY=1
+</code></pre>
+<p>Build và khởi động bản riêng (không tải image của dự án gốc):</p>
+<pre><code class="language-sh">docker compose build --pull
+docker compose up -d
+docker compose ps
+docker compose logs --tail=100 webmail
+curl http://127.0.0.1:8080/api/health
+</code></pre>
+<p>Image được tạo có tên <code>lehuunghi/webmail:local</code>. <code>/data</code> được lưu trong volume <code>webmail-data</code> (Compose có thể thêm tiền tố tên dự án). Đừng xóa volume khi cập nhật. Nếu chạy nhiều bản, mỗi bản dùng volume và bí mật riêng.</p>
+<h3>HTTPS bằng Caddy trên cùng VPS</h3>
+<p>Trỏ DNS trước, mở cổng 80/443. Với Caddy cài trực tiếp trên host, thêm:</p>
+<pre><code class="language-caddyfile">webmail.example.com {
+    reverse_proxy 127.0.0.1:8080
+}
+</code></pre>
+<p>Reload Caddy rồi mở <code>https://webmail.example.com</code>. Cổng 8080 chỉ bind loopback. Nếu proxy cũng chạy Docker, kết nối hai container vào cùng mạng và proxy tới <code>webmail:8080</code>; <code>127.0.0.1</code> trong container proxy là chính container đó. Không cần công khai cổng 8080. Nginx cần chuyển <code>Host</code>, <code>X-Forwarded-Proto</code>, <code>X-Forwarded-For</code>; tắt buffering cho kết nối sự kiện nếu cập nhật thư bị chậm.</p>
+<h3>Cập nhật và quay lui</h3>
+<pre><code class="language-sh">docker tag lehuunghi/webmail:local lehuunghi/webmail:previous
+git pull --ff-only
+docker compose build --pull
+docker compose up -d
+</code></pre>
+<p>Kiểm tra health và đăng nhập. Nếu cần quay lui: <code>docker tag lehuunghi/webmail:previous lehuunghi/webmail:local</code>, rồi <code>docker compose up -d --force-recreate --no-build</code>. Giữ <code>.env</code>, APP_SECRET và volume. Trước thay đổi lớn, sao lưu volume khi ứng dụng đã dừng; dữ liệu thư thật nằm trên Stalwart, cần sao lưu riêng.</p>
+<h2 id="portainer">3. Portainer (Docker Standalone)</h2>
+<p>Hướng dẫn này dùng môi trường <strong>Docker Standalone</strong>, không phải Swarm. Image phải tồn tại trên <strong>đúng Docker host mà Portainer quản lý</strong>.</p>
+<ol>
+<li>SSH vào Docker host đó; clone repo và chạy <code>docker build --pull -t lehuunghi/webmail:local .</code> từ thư mục repo. Nếu build trên máy khác, chuyển image bằng <code>docker save</code> / <code>docker load</code>, hoặc push lên registry của bạn. Tag <code>:local</code> không phải image đã được xuất bản sẵn trên Docker Hub.</li>
+<li>Trong Portainer chọn Environment đúng → <strong>Stacks → Add stack</strong>. Đặt tên <code>webmail</code>.</li>
+<li>Chọn <strong>Web editor</strong>, dán nội dung <code>docker-compose.portainer.yml</code> của repo. File này dùng image đã build nên không cần build context trong Web editor.</li>
+<li>Trong <strong>Environment variables</strong>, thêm <code>STALWART_URL</code> và <code>APP_SECRET</code>; nếu dùng registry/tag khác thêm <code>WEBMAIL_IMAGE</code>. Không bật buộc pull image khi đang dùng image local.</li>
+<li>Chọn <strong>Deploy the stack</strong>. Mở Containers → container webmail → Logs và kiểm tra trạng thái health. Nếu cổng 8080 đã dùng, thay phần host trong mapping thành <code>127.0.0.1:8081:8080</code> và sửa proxy tương ứng.</li>
+<li>Cấu hình HTTPS như phần Docker. Với Nginx Proxy Manager chạy Docker, dùng mạng chung (thêm external network vào stack), hostname upstream là tên service/container trên mạng đó, cổng 8080. Đừng dùng loopback của host làm upstream từ container.</li>
+<li>Khi cập nhật, build lại trên host đúng hoặc push tag phiên bản mới. Đổi <code>WEBMAIL_IMAGE</code> sang tag mới trong stack rồi redeploy. Với image local giữ cùng tag, recreate container sau build; không chọn pull từ registry. Giữ volume và APP_SECRET.</li>
+</ol>
+<p>Có thể dùng Repository thay cho Web editor với <code>docker-compose.yml</code> nếu môi trường Portainer hỗ trợ build từ Git. Cách image đã build ở trên dễ kiểm tra hơn và không phụ thuộc hỗ trợ build của Portainer.</p>
+<h2 id="cpanel">4. Node.js trên hosting cPanel</h2>
+<p>Hosting phải hỗ trợ Node.js/Passenger (Application Manager hoặc CloudLinux <strong>Setup Node.js App</strong>), SSH/Terminal, biến môi trường, kết nối HTTPS ra Stalwart và tiến trình Node lâu dài. Hosting PHP thông thường không chạy được ứng dụng này. Hỏi nhà cung cấp về Node 22.12+/24 LTS và SSE/WebSocket nếu sự kiện cập nhật bị chặn. Không cài Docker vào shared hosting.</p>
+<h3>4.1 Tải và build</h3>
+<p>Dùng thư mục ngoài <code>public_html</code>, ví dụ <code>/home/CPANEL_USER/webmail</code>:</p>
+<pre><code class="language-sh">cd ~
+git clone https://github.com/lehuunghi/webmail.git
+cd webmail
+node --version
+npm ci
+npm run build
+mkdir -p data tmp
+chmod 700 data
+openssl rand -base64 48
+</code></pre>
+<p>Nếu hosting không đủ RAM hoặc thiếu Node phù hợp để build, build trên máy Linux khác rồi tải lên <code>web/dist</code>, <code>server/dist</code>, <code>scripts</code>, <code>app.cjs</code>, các package.json và package-lock.json; sau đó chạy <code>npm ci --omit=dev --workspace server</code> trên hosting. Không tải node_modules của Windows lên Linux.</p>
+<h3>4.2 Tạo ứng dụng</h3>
+<ol>
+<li>Tạo subdomain <code>webmail.example.com</code>, bật AutoSSL và buộc HTTPS.</li>
+<li>Trong <strong>Setup Node.js App</strong>, chọn Node phù hợp, mode Production, application root <code>webmail</code>, URL subdomain, startup file <strong>app.cjs</strong>. Repo cung cấp file này để Passenger nạp được CommonJS và khởi động server ESM đã build.</li>
+<li>Nếu dùng <strong>Application Manager</strong> của cPanel chuẩn: đăng ký application path <code>/home/CPANEL_USER/webmail</code>; nhờ nhà cung cấp cấu hình <code>PassengerStartupFile app.cjs</code> trong cấu hình Passenger theo tài liệu cPanel. Giao diện này có thể không có ô startup file. Không sửa tên server/dist/index.js tùy ý.</li>
+<li>Thêm các biến sau trong giao diện quản lý ứng dụng; thay CPANEL_USER và địa chỉ Stalwart:</li>
+</ol>
+<pre><code class="language-dotenv">NODE_ENV=production
+STALWART_URL=https://mail.example.com
+APP_SECRET=BI_MAT_NGAU_NHIEN_CUA_BAN
+APP_NAME=Webmail
+SOURCE_URL=https://github.com/lehuunghi/webmail
+STATIC_DIR=/home/CPANEL_USER/webmail/web/dist
+SESSION_FILE=/home/CPANEL_USER/webmail/data/sessions.json
+TRUST_PROXY=1
+IMAGE_PROXY=1
+</code></pre>
+<p>Ứng dụng không tự nạp <code>.env</code> khi chạy <code>node</code> thông thường. Nhập biến vào cPanel là bước bắt buộc. Để Passenger quản lý socket/cổng, không ép PORT nếu nhà cung cấp không yêu cầu. APP_SECRET phải đủ mạnh; server sẽ từ chối khởi động production khi thiếu.</p>
+<ol start="5">
+<li>Start/Restart app. Nếu có môi trường ảo CloudLinux, chạy lệnh kích hoạt môi trường mà cPanel hiển thị trước khi chạy npm.</li>
+<li>Mở <code>https://webmail.example.com/api/health</code>, rồi đăng nhập bằng tài khoản Stalwart. Trang đăng nhập phải có “Tiếng Việt”, “Đăng nhập” và liên kết hướng dẫn. Thử gửi/nhận một thư bằng tài khoản thật.</li>
+</ol>
+<h3>4.3 Cập nhật cPanel</h3>
+<p>Sao lưu mã nguồn phiên bản cũ, <code>data</code> và ghi lại các biến. Chạy <code>git pull --ff-only</code>, <code>npm ci</code>, <code>npm run build</code>, sau đó Restart trong cPanel. Với Passenger có thể chạy <code>mkdir -p tmp &amp;&amp; touch tmp/restart.txt</code>. Kiểm tra health, đăng nhập, tài liệu và log lỗi. Không đưa APP_SECRET vào thư mục web công khai.</p>
+<h2>5. Kiểm tra và xử lý lỗi</h2>
+<table>
+<thead>
+<tr>
+<th>Hiện tượng</th>
+<th>Kiểm tra</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>502/503</td>
+<td>Tiến trình Node, log Passenger/Portainer, startup app.cjs và thư mục dist đã build</td>
+</tr>
+<tr>
+<td>Không đăng nhập</td>
+<td>URL Stalwart, tài khoản/mật khẩu thật, TLS hợp lệ, JMAP bật, Stalwart &gt;=0.16</td>
+</tr>
+<tr>
+<td>Đăng nhập xong lại bị thoát</td>
+<td>HTTPS, X-Forwarded-Proto, TRUST_PROXY, APP_SECRET cố định, quyền ghi data</td>
+</tr>
+<tr>
+<td>Giao diện trắng/404 assets</td>
+<td>BASE_PATH lúc build và chạy phải trùng; tránh cache bundle cũ</td>
+</tr>
+<tr>
+<td>Portainer báo pull denied</td>
+<td>Image :local phải build/load trên đúng host; tắt pull hoặc dùng registry/tag đã push</td>
+</tr>
+<tr>
+<td>Không thấy thư mới ngay</td>
+<td>Reverse proxy buffering/timeouts và hosting hỗ trợ luồng sự kiện; thử tải lại</td>
+</tr>
+</tbody></table>
+<p>Kiểm thử demo dùng <code>npm run mock</code> và STALWART_URL <code>http://127.0.0.1:8788</code>, tài khoản <code>demo@example.com</code> / mật khẩu <code>demo</code>. Chỉ dùng trong môi trường thử nghiệm, không triển khai demo công khai. Test demo không thay thế kiểm thử Stalwart và hosting thật.</p>
+<h2>Tài liệu đối chiếu</h2>
+<ul>
+<li>cPanel: <a href="https://docs.cpanel.net/knowledge-base/web-services/how-to-install-a-node.js-application/">https://docs.cpanel.net/knowledge-base/web-services/how-to-install-a-node.js-application/</a></li>
+<li>Startup file Passenger: <a href="https://support.cpanel.net/hc/en-us/articles/360057519553-How-to-create-a-custom-NodeJS-startup-file">https://support.cpanel.net/hc/en-us/articles/360057519553-How-to-create-a-custom-NodeJS-startup-file</a></li>
+<li>Portainer stacks: <a href="https://docs.portainer.io/user/docker/stacks/add">https://docs.portainer.io/user/docker/stacks/add</a></li>
+<li>Docker Compose: <a href="https://docs.docker.com/compose/">https://docs.docker.com/compose/</a></li>
+</ul>
+<p>Giữ LICENSE và NOTICE trong bản phân phối. Liên kết “Mã nguồn AGPL-3.0” trong ứng dụng trỏ đến mã nguồn bản của bạn.</p>
+</main></body></html>

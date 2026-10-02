@@ -17,10 +17,10 @@ export function AboutSettings() {
       <h1>{t("About {app}", { app: appName })}</h1>
       <p className="lead">{tNode("A fast, friendly, open-source webmail for {server}, built on JMAP.", { server: <a href="https://stalw.art" target="_blank" rel="noreferrer">{t("Stalwart Mail Server")}</a> })}</p>
       <div className="row" style={{ gap: 16, alignItems: "center", marginBottom: 16 }}>
-        <img src={withBase("/img/logo.png")} alt={appName} width={96} />
+        <img src={withBase("/img/webmail.svg")} alt={appName} width={96} />
         <div>
           {/* A product name and a version string: neither is a word to translate. */}
-          <div style={{ fontWeight: 700, fontSize: "1.2em" }} className="notranslate" translate="no">ihasmail v{APP_VERSION}</div>
+          <div style={{ fontWeight: 700, fontSize: "1.2em" }} className="notranslate" translate="no">{appName} v{APP_VERSION}</div>
           <div className="hint">{tNode("AGPL-3.0-or-later · {source}", { source: <a href={sourceUrl} target="_blank" rel="noreferrer">{sourceUrl.replace(/^https?:\/\//, "")}</a> })}</div>
         </div>
       </div>

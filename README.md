@@ -3,7 +3,7 @@
 Bản tùy chỉnh của [Coffey-Labs/ihasmail](https://github.com/Coffey-Labs/ihasmail),
 duy trì mã nguồn tại [lehuunghi/webmail](https://github.com/lehuunghi/webmail).
 
-- **Tiếng Việt:** chọn **Tiếng Việt (Beta)** ngay ở màn hình đăng nhập, hoặc trong
+- **Tiếng Việt:** là ngôn ngữ mặc định ngay ở màn hình đăng nhập; có thể đổi trong
   **Settings → Appearance → Interface language**. Bản dịch gồm thư, lịch, danh bạ,
   tệp, cài đặt và quyền quản trị. Beta cho đến khi được người bản ngữ duyệt.
 - **Giao diện Webmail:** nền sáng, thanh tìm kiếm bo tròn, nút Soạn thư xanh nhạt,
@@ -11,7 +11,11 @@ duy trì mã nguồn tại [lehuunghi/webmail](https://github.com/lehuunghi/webm
 - Người dùng mới mặc định dùng chủ đề **Webmail**, chế độ sáng và ẩn ngăn đọc.
   Tài khoản đã lưu cài đặt vẫn giữ lựa chọn cũ; vào **Settings → Appearance**
   chọn **Webmail / Light**, và **General → Reading pane → Off** nếu muốn bố cục mới.
-- Ngôn ngữ tiếng Anh vẫn là mặc định và dự phòng; có thể chuyển ngôn ngữ bất cứ lúc nào.
+- Ngôn ngữ tiếng Anh là dự phòng khi thiếu bản dịch; có thể chuyển ngôn ngữ bất cứ lúc nào.
+
+## Hướng dẫn cài đặt bản riêng
+
+Đọc [hướng dẫn tiếng Việt](docs/CAI-DAT.md) để cài bằng Docker, Portainer hoặc Node.js trên cPanel. Bản chạy cũng có liên kết **Hướng dẫn cài đặt** trên trang đăng nhập và trong menu tài khoản. Image `lehuunghi/webmail:local` được build từ chính repo này, không phải image có sẵn trên Docker Hub.
 
 ## Chạy thử
 

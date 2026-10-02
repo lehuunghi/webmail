@@ -4,6 +4,8 @@ import type { Catalog } from "@/lib/i18n";
 // Vietnamese uses only the CLDR "other" plural category.
 export const catalog: Catalog = {
   strings: {
+    "Ask again": "Yêu cầu lại",
+    "Make {app} the default mail app": "Đặt {app} làm ứng dụng thư mặc định",
     "Stay signed in, and keep settings and recent addresses on this computer.": "Duy trì đăng nhập và lưu cài đặt cùng các địa chỉ gần đây trên máy tính này.",
     "Signed out after 5 minutes of inactivity, and nothing is kept on this computer. Leave this unticked on a shared or public one.": "Tự đăng xuất sau 5 phút không hoạt động và không lưu dữ liệu trên máy tính này. Không chọn trên máy dùng chung hoặc công cộng.",
     "Signing in…": "Đang đăng nhập…",
@@ -967,7 +969,7 @@ export const catalog: Catalog = {
     "New label": "Nhãn mới",
     "Delete label": "Xóa nhãn",
     "Large attachments may be rejected by some servers": "Một số máy chủ có thể từ chối tệp đính kèm lớn",
-    "Images are stored in your Files (folder “ihasmail”) and embedded when you send.": "Hình ảnh được lưu trong Tệp của bạn (thư mục “ihasmail”) và nhúng vào thư khi gửi.",
+    "Images are stored in your Files and embedded when you send.": "Hình ảnh được lưu trong Tệp của bạn và nhúng vào thư khi gửi.",
     "Thanks for your message. I'm away until … and will reply when I'm back.": "Cảm ơn bạn đã gửi thư. Tôi vắng mặt đến … và sẽ trả lời khi trở lại.",
     "Automatically reply to people who email you while you're away. Each sender gets at most one reply.": "Tự động trả lời người gửi khi bạn vắng mặt. Mỗi người gửi nhận tối đa một thư trả lời.",
     "Sort incoming mail automatically. Rules run on the server (Sieve), so they work for every client you use.": "Tự động sắp xếp thư đến. Quy tắc chạy trên máy chủ (Sieve), nên có hiệu lực với mọi ứng dụng thư bạn dùng.",
@@ -976,8 +978,8 @@ export const catalog: Catalog = {
     "Advanced: manage raw Sieve scripts. Only one script can be active at a time.": "Nâng cao: quản lý tập lệnh Sieve thô. Chỉ một tập lệnh có thể hoạt động tại một thời điểm.",
     "Only part of your filter script arrived.": "Chỉ nhận được một phần tập lệnh lọc của bạn.",
     "Your active script “{name}” was written by hand.": "Tập lệnh đang hoạt động “{name}” được viết thủ công.",
-    "Another script (“{name}”) is active. Saving rules here will activate the “ihasmail” script instead.": "Tập lệnh khác (“{name}”) đang hoạt động. Lưu quy tắc tại đây sẽ kích hoạt tập lệnh “ihasmail” thay thế.",
-    "“{name}” will be deactivated (not deleted) and a new “ihasmail” script will take over.": "“{name}” sẽ bị vô hiệu hóa (không bị xóa) và tập lệnh “ihasmail” mới sẽ thay thế.",
+    "Another script (“{name}”) is active. Saving rules here will activate the app’s rules script instead.": "Tập lệnh khác (“{name}”) đang hoạt động. Lưu quy tắc tại đây sẽ kích hoạt tập lệnh quy tắc thay thế.",
+    "“{name}” will be deactivated (not deleted) and a new rules script will take over.": "“{name}” sẽ bị vô hiệu hóa (không bị xóa) và tập lệnh quy tắc mới sẽ thay thế.",
     "Sieve filtering is not available for this account.": "Lọc Sieve không khả dụng cho tài khoản này.",
     "Sieve filtering is not enabled for this account.": "Lọc Sieve chưa được bật cho tài khoản này.",
     "Vacation responses are not available for this account.": "Trả lời khi vắng mặt không khả dụng cho tài khoản này.",
@@ -1592,7 +1594,7 @@ export const catalog: Catalog = {
     "no address": "không có địa chỉ",
     "Labels are IMAP keywords stored on your messages, so every other client sees them. Names, colors and nesting are {app}’s own and follow your account. Nesting is display only — it rewrites nothing in the mailbox.": "Nhãn là từ khóa IMAP lưu trên thư nên các ứng dụng khác đều thấy. Tên, màu và cấu trúc lồng nhau do {app} quản lý và đồng bộ theo tài khoản. Cấu trúc lồng nhau chỉ dùng để hiển thị, không viết lại hộp thư.",
     "{app} test": "Thử nghiệm {app}",
-    "ihasmail.org": "ihasmail.org",
+    "ihasmail.org": "Webmail.org",
     "Stalwart Mail Server": "Stalwart Mail Server",
     "AGPL-3.0-or-later · {source}": "AGPL-3.0-or-later · {source}",
     "Stalwart": "Stalwart",

@@ -1,0 +1,26 @@
+# Build the image on the target Docker host first (see docs/CAI-DAT.md).
+# Portainer Web editor uses this stack without needing a source directory.
+services:
+  webmail:
+    image: ${WEBMAIL_IMAGE:-lehuunghi/webmail:local}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      STALWART_URL: ${STALWART_URL:?set STALWART_URL}
+      APP_SECRET: ${APP_SECRET:?set APP_SECRET}
+      APP_NAME: Webmail
+      SOURCE_URL: https://github.com/lehuunghi/webmail
+      TRUST_PROXY: "1"
+      IMAGE_PROXY: "1"
+    volumes:
+      - webmail-data:/data
+volumes:
+  webmail-data:

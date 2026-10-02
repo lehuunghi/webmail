@@ -468,7 +468,7 @@ export function MailView({ mailboxId, threadId, search }: { mailboxId?: string; 
             <ThreadView key={`${threadId}:${openMessageId ?? ""}`} threadId={threadId} messageId={openMessageId} mailboxId={mailboxId ?? null} onBack={() => openThread(null)} actions={actions} onNavigate={(delta) => { const idx = currentRowIndex; const next = ids[idx + delta]; const t = next ? rowThreadId(next) : undefined; if (t) { setFocusId(next!); openThread(t, settings.conversationMode ? null : next!); } }} hasPrev={currentRowIndex > 0} hasNext={currentRowIndex >= 0 && currentRowIndex < ids.length - 1} />
           ) : (
             <div className="no-thread">
-              <img src={withBase("/img/logo.png")} alt="" />
+              <img src={withBase("/img/webmail.svg")} alt="" />
               <div>
                 {list?.total
                   ? settings.conversationMode

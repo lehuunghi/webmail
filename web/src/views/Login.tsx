@@ -130,9 +130,9 @@ export function LoginPage() {
             One <p> with a break rather than two: .foot carries a 20px
             margin-top, which a second paragraph would repeat as a gap.
           */}
-          <span className="notranslate" translate="no">ihasmail v{APP_VERSION}</span>
+          <span className="notranslate" translate="no">{appName} v{APP_VERSION}</span>
           <br />
-          <a href="https://ihasmail.org" target="_blank" rel="noopener noreferrer">{t("ihasmail.org")}</a>
+          <a href={withBase("/huong-dan.html")}>Hướng dẫn cài đặt</a>
           {" · "}
           <a href={sourceUrl} target="_blank" rel="noopener noreferrer">{t("AGPL-3.0 source")}</a>
         </p>
