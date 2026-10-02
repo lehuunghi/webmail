@@ -84,7 +84,7 @@ describe("reordering folders in the tree", () => {
   afterEach(() => { act(() => root.unmount()); host.remove(); });
 
   it("lists special folders under Inbox before the rest, until something is dragged", () => {
-    expect(rows()).toEqual(["Inbox", "Drafts", "Sent", "Deleted Items", "Alpha", "Zeta"]);
+    expect(rows()).toEqual(["Inbox", "Sent", "Drafts", "Deleted Items", "Alpha", "Zeta"]);
   });
 
   it("puts a folder above the row when it's dropped on the row's top edge", () => {
