@@ -13,7 +13,7 @@ Trong lúc PR #1 chưa được merge, giao diện tiếng Việt, logo URL và 
 ## 1. Chuẩn bị chung
 
 - Tên miền giao diện, ví dụ `webmail.example.com`, trỏ đến máy chạy ứng dụng.
-- Địa chỉ Stalwart, ví dụ `https://mail.example.com`, có chứng chỉ TLS hợp lệ. Từ máy chạy Webmail phải truy cập được `https://mail.example.com/.well-known/jmap`.
+- Địa chỉ Stalwart, ví dụ `https://jmail.vn`, có chứng chỉ TLS hợp lệ. Từ máy chạy Webmail phải truy cập được `https://jmail.vn/.well-known/jmap`.
 - HTTPS cho giao diện (AutoSSL cPanel hoặc reverse proxy Caddy/Nginx). Khi đặt `TRUST_PROXY=1`, cookie đăng nhập yêu cầu HTTPS.
 - Tạo bí mật riêng bằng `openssl rand -base64 48`. Giữ nguyên bí mật khi cập nhật; không đưa `.env` vào Git.
 - Máy build cần Node.js **22.12 trở lên hoặc 24 LTS** và npm. Chỉ thỏa `>=20.19` trong package.json chưa đủ cho các công cụ build hiện tại. Dockerfile sử dụng Node 26.
@@ -24,14 +24,14 @@ Trong lúc PR #1 chưa được merge, giao diện tiếng Việt, logo URL và 
 Chạy từ máy sẽ đặt Webmail:
 
 ```sh
-curl -I https://mail.example.com/.well-known/jmap
+curl -I https://jmail.vn/.well-known/jmap
 ```
 
 Phản hồi 401 khi chưa xác thực có thể là bình thường. Lỗi DNS, timeout hoặc lỗi chứng chỉ phải xử lý trước. Không dùng `curl -k` để coi lỗi chứng chỉ là đã giải quyết. `STALWART_URL` là URL gốc, không thêm `/jmap`, `/.well-known/jmap` hoặc đường dẫn admin. Tài khoản đăng nhập phải là tài khoản đã tạo trên Stalwart.
 
 | Biến | Cách dùng trong bản này |
 | --- | --- |
-| `STALWART_URL` | Bắt buộc; ví dụ `https://mail.example.com` |
+| `STALWART_URL` | Mặc định `https://jmail.vn`; đổi nếu dùng máy chủ JMAP khác |
 | `APP_SECRET` | Bắt buộc ở production; tạo ngẫu nhiên, giữ nguyên qua các lần cập nhật |
 | `APP_NAME` | Tên hiển thị; mặc định Webmail |
 | `APP_LOGO_URL` | URL trực tiếp tới ảnh hoặc đường dẫn nội bộ; để trống dùng logo mặc định |
@@ -59,7 +59,7 @@ openssl rand -base64 48
 Sửa `.env`, tối thiểu:
 
 ```dotenv
-STALWART_URL=https://mail.example.com
+STALWART_URL=https://jmail.vn
 APP_SECRET=THAY_BANG_BI_MAT_VUA_TAO
 APP_NAME=Webmail
 APP_LOGO_URL=
@@ -145,7 +145,7 @@ Có thể dùng Repository thay cho Web editor với `docker-compose.yml` nếu 
 
 | Tên | Ví dụ |
 | --- | --- |
-| `STALWART_URL` | `https://mail.example.com` |
+| `STALWART_URL` | `https://jmail.vn` |
 | `APP_SECRET` | Giá trị tạo bằng openssl; không dùng nguyên chuỗi minh họa |
 | `WEBMAIL_IMAGE` | `lehuunghi/webmail:local` hoặc tag registry riêng đã build |
 | `APP_LOGO_URL` | `https://cdn.example.com/logo.png`, hoặc bỏ trống |
@@ -189,7 +189,7 @@ Các đường dẫn cần có sau build: `web/dist/index.html`, `server/dist/in
 
 ```dotenv
 NODE_ENV=production
-STALWART_URL=https://mail.example.com
+STALWART_URL=https://jmail.vn
 APP_SECRET=BI_MAT_NGAU_NHIEN_CUA_BAN
 APP_NAME=Webmail
 APP_LOGO_URL=

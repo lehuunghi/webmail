@@ -127,7 +127,7 @@ against 0.16.22; what changed in each release is in
 
 ```bash
 cp .env.example .env
-# edit: STALWART_URL=https://mail.example.com  and  APP_SECRET=$(openssl rand -base64 48)
+# edit: STALWART_URL=https://jmail.vn  and  APP_SECRET=$(openssl rand -base64 48)
 docker compose up --build -d
 # → http://localhost:8080 — put a reverse proxy in front for TLS
 ```

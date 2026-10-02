@@ -58,7 +58,7 @@ if (!appSecret || appSecret === "change-me") {
   );
 }
 
-const stalwartUrl = env("STALWART_URL", "https://mail.example.com").replace(/\/+$/, "");
+const stalwartUrl = env("STALWART_URL", "https://jmail.vn").replace(/\/+$/, "");
 
 /**
  * Declares that this instance is running as an immutable container: read-only

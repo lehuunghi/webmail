@@ -11,7 +11,7 @@
 <h2 id="chuan-bi">1. Chuẩn bị chung</h2>
 <ul>
 <li>Tên miền giao diện, ví dụ <code>webmail.example.com</code>, trỏ đến máy chạy ứng dụng.</li>
-<li>Địa chỉ Stalwart, ví dụ <code>https://mail.example.com</code>, có chứng chỉ TLS hợp lệ. Từ máy chạy Webmail phải truy cập được <code>https://mail.example.com/.well-known/jmap</code>.</li>
+<li>Địa chỉ Stalwart, ví dụ <code>https://jmail.vn</code>, có chứng chỉ TLS hợp lệ. Từ máy chạy Webmail phải truy cập được <code>https://jmail.vn/.well-known/jmap</code>.</li>
 <li>HTTPS cho giao diện (AutoSSL cPanel hoặc reverse proxy Caddy/Nginx). Khi đặt <code>TRUST_PROXY=1</code>, cookie đăng nhập yêu cầu HTTPS.</li>
 <li>Tạo bí mật riêng bằng <code>openssl rand -base64 48</code>. Giữ nguyên bí mật khi cập nhật; không đưa <code>.env</code> vào Git.</li>
 <li>Máy build cần Node.js <strong>22.12 trở lên hoặc 24 LTS</strong> và npm. Chỉ thỏa <code>&gt;=20.19</code> trong package.json chưa đủ cho các công cụ build hiện tại. Dockerfile sử dụng Node 26.</li>
@@ -19,7 +19,7 @@
 </ul>
 <h3>Kiểm tra trước khi cài</h3>
 <p>Chạy từ máy sẽ đặt Webmail:</p>
-<pre><code class="language-sh">curl -I https://mail.example.com/.well-known/jmap
+<pre><code class="language-sh">curl -I https://jmail.vn/.well-known/jmap
 </code></pre>
 <p>Phản hồi 401 khi chưa xác thực có thể là bình thường. Lỗi DNS, timeout hoặc lỗi chứng chỉ phải xử lý trước. Không dùng <code>curl -k</code> để coi lỗi chứng chỉ là đã giải quyết. <code>STALWART_URL</code> là URL gốc, không thêm <code>/jmap</code>, <code>/.well-known/jmap</code> hoặc đường dẫn admin. Tài khoản đăng nhập phải là tài khoản đã tạo trên Stalwart.</p>
 <table>
@@ -31,7 +31,7 @@
 </thead>
 <tbody><tr>
 <td><code>STALWART_URL</code></td>
-<td>Bắt buộc; ví dụ <code>https://mail.example.com</code></td>
+<td>Mặc định <code>https://jmail.vn</code>; đổi nếu dùng máy chủ JMAP khác</td>
 </tr>
 <tr>
 <td><code>APP_SECRET</code></td>
@@ -80,7 +80,7 @@ chmod 600 .env
 openssl rand -base64 48
 </code></pre>
 <p>Sửa <code>.env</code>, tối thiểu:</p>
-<pre><code class="language-dotenv">STALWART_URL=https://mail.example.com
+<pre><code class="language-dotenv">STALWART_URL=https://jmail.vn
 APP_SECRET=THAY_BANG_BI_MAT_VUA_TAO
 APP_NAME=Webmail
 APP_LOGO_URL=
@@ -153,7 +153,7 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      STALWART_URL: ${STALWART_URL:?set STALWART_URL}
+      STALWART_URL: ${STALWART_URL:-https://jmail.vn}
       APP_SECRET: ${APP_SECRET:?set APP_SECRET}
       APP_NAME: Webmail
       APP_LOGO_URL: ${APP_LOGO_URL:-}
@@ -175,7 +175,7 @@ volumes:
 </thead>
 <tbody><tr>
 <td><code>STALWART_URL</code></td>
-<td><code>https://mail.example.com</code></td>
+<td><code>https://jmail.vn</code></td>
 </tr>
 <tr>
 <td><code>APP_SECRET</code></td>
@@ -217,7 +217,7 @@ openssl rand -base64 48
 <li>Thêm các biến sau trong giao diện quản lý ứng dụng; thay CPANEL_USER và địa chỉ Stalwart:</li>
 </ol>
 <pre><code class="language-dotenv">NODE_ENV=production
-STALWART_URL=https://mail.example.com
+STALWART_URL=https://jmail.vn
 APP_SECRET=BI_MAT_NGAU_NHIEN_CUA_BAN
 APP_NAME=Webmail
 APP_LOGO_URL=
@@ -383,7 +383,7 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      STALWART_URL: ${STALWART_URL:?set STALWART_URL}
+      STALWART_URL: ${STALWART_URL:-https://jmail.vn}
       APP_SECRET: ${APP_SECRET:?set APP_SECRET}
       APP_NAME: ${APP_NAME:-Webmail}
       APP_LOGO_URL: ${APP_LOGO_URL:-}
