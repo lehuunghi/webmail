@@ -4,6 +4,7 @@ import type { Catalog } from "@/lib/i18n";
 // Vietnamese uses only the CLDR "other" plural category.
 export const catalog: Catalog = {
   strings: {
+    "Use your account to access your workspace.": "Sử dụng tài khoản của bạn để truy cập không gian làm việc.",
     "Ask again": "Yêu cầu lại",
     "Make {app} the default mail app": "Đặt {app} làm ứng dụng thư mặc định",
     "Stay signed in, and keep settings and recent addresses on this computer.": "Duy trì đăng nhập và lưu cài đặt cùng các địa chỉ gần đây trên máy tính này.",

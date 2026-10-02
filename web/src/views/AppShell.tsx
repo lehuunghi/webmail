@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "wouter";
-import { BookOpen, Calendar, ChevronsUpDown, FolderOpen, Globe, HelpCircle, LogOut, Mail, Menu as MenuIcon, Moon, PenSquare, Plus, RefreshCw, Settings, ShieldCheck, Sun, Upload, Users, X } from "lucide-react";
+import { Calendar, ChevronsUpDown, FolderOpen, HelpCircle, LogOut, Mail, Menu as MenuIcon, Moon, PenSquare, Plus, RefreshCw, Settings, ShieldCheck, Sun, Upload, Users, X } from "lucide-react";
 import { useSession } from "@/store/session";
 import { withBase } from "@/lib/basePath";
 import { DEFAULT_APP_NAME } from "@/lib/brand";
@@ -141,7 +141,7 @@ export function AppShell({ children }: { children: ReactNode }) {
    */
 
   return (
-    <div className="app">
+    <div className="app workspace-app">
       <header className="topbar">
         <button className="icon-btn" aria-label={t("Menu")} onClick={() => (isMobile ? setDrawer((d) => !d) : update({ sidebarCollapsed: !collapsed }))}>
           <MenuIcon size={22} />
@@ -182,11 +182,6 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
             </div>
             <MenuSep />
-            <MenuItem icon={<BookOpen size={16} />} label={t("Documentation")} href={withBase("/huong-dan.html")} external />
-            {/* The project site. It is linked from the login screen footer, which
-                is a page a signed-in user never sees again -- so from inside the
-                app there was no way back to it. */}
-            <MenuItem icon={<Globe size={16} />} label={t("About {app}", { app: appName })} href="https://github.com/lehuunghi/webmail" external />
             <MenuItem icon={<Settings size={16} />} label={t("Settings")} onClick={() => navigate("/settings")} />
             {/* Only for an account whose Stalwart role manages other accounts.
                 Nobody else is shown an entry that would open onto refusals. */}
@@ -216,6 +211,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         className={`app-body ${collapsed && !isMobile ? "collapsed" : ""} ${liveSidebarWidth != null ? "resizing" : ""}`}
         style={shownSidebarWidth != null && !isMobile ? ({ "--sidebar-w": `${shownSidebarWidth}px` } as React.CSSProperties) : undefined}
       >
+        <nav className="workspace-rail" aria-label={t("Sections")}>
+          <ModuleLink href="/mail" icon={<Mail size={20} />} label={t("Mail")} active={section === "mail" || section === "search"} />
+          <ModuleLink href="/calendar" icon={<Calendar size={20} />} label={t("Calendar")} active={section === "calendar"} />
+          <ModuleLink href="/contacts" icon={<Users size={20} />} label={t("Contacts")} active={section === "contacts"} />
+          <ModuleLink href="/files" icon={<FolderOpen size={20} />} label={t("Files")} active={section === "files"} />
+        </nav>
         <div className={`drawer-backdrop ${drawer ? "open" : ""}`} onClick={() => setDrawer(false)} />
         <aside ref={sidebarRef} className={`sidebar ${drawer ? "open" : ""}`}>
           {/*
@@ -265,12 +266,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             {section === "admin" && <AdminNav />}
           </div>
           {(section === "mail" || section === "search") && <QuotaBar />}
-          <nav className="module-bar" aria-label={t("Go to")}>
-            <ModuleLink href="/mail" icon={<Mail size={20} />} label={t("Mail")} active={section === "mail" || section === "search"} />
-            <ModuleLink href="/calendar" icon={<Calendar size={20} />} label={t("Calendar")} active={section === "calendar"} />
-            <ModuleLink href="/contacts" icon={<Users size={20} />} label={t("Contacts")} active={section === "contacts"} />
-            <ModuleLink href="/files" icon={<FolderOpen size={20} />} label={t("Files")} active={section === "files"} />
-          </nav>
         </aside>
         {/* Not on a phone, where the sidebar is a drawer over the page, and not
             while collapsed to icons, where there is no width to choose. */}
