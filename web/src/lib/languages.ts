@@ -52,7 +52,7 @@ export const UI_LANGUAGES: readonly UiLanguage[] = [
 /** Where to report a bad translation. Beta languages depend on it. */
 export const TRANSLATION_ISSUE_URL = "https://github.com/lehuunghi/webmail/issues/new?title=Translation%3A%20";
 
-export const DEFAULT_UI_LANGUAGE = "en";
+export const DEFAULT_UI_LANGUAGE = "vi";
 
 /**
  * The language to actually render in.

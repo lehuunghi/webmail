@@ -1,5 +1,5 @@
 import { createElement, Fragment, useSyncExternalStore, type ReactNode } from "react";
-import { DEFAULT_UI_LANGUAGE, resolveUiLanguage } from "@/lib/languages";
+import { resolveUiLanguage } from "@/lib/languages";
 
 /**
  * Translation, in about as little machinery as the job takes.
@@ -33,7 +33,7 @@ export interface Catalog {
 const EMPTY: Catalog = { strings: {}, plurals: {} };
 
 let current: Catalog = EMPTY;
-let currentTag: string = DEFAULT_UI_LANGUAGE;
+let currentTag: string = "en";
 let version = 0;
 const listeners = new Set<() => void>();
 
@@ -216,8 +216,8 @@ export async function loadLanguage(tag: string): Promise<void> {
 
 async function loadLanguageNow(tag: string): Promise<void> {
   const resolved = resolveUiLanguage(tag);
-  if (resolved === DEFAULT_UI_LANGUAGE) {
-    setCatalog(DEFAULT_UI_LANGUAGE, EMPTY);
+  if (resolved === "en") {
+    setCatalog("en", EMPTY);
     return;
   }
   try {
@@ -227,7 +227,7 @@ async function loadLanguageNow(tag: string): Promise<void> {
     // A catalog that will not load leaves English in force rather than a
     // half-rendered page. `resolveUiLanguage` should already have prevented
     // this; it being reachable at all is why it is caught.
-    setCatalog(DEFAULT_UI_LANGUAGE, EMPTY);
+    setCatalog("en", EMPTY);
   }
 }
 

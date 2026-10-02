@@ -13,7 +13,7 @@ function TranslatedLogin() {
 }
 beforeEach(async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ appName: "Webmail", sourceUrl: "https://github.com/lehuunghi/webmail" }) }));
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ appName: "Webmail", logoUrl: "https://cdn.example.com/logo.png", sourceUrl: "https://github.com/lehuunghi/webmail" }) }));
   useSettings.setState({ settings: { ...DEFAULT_SETTINGS, uiLanguage: "en" } });
   await loadLanguage("en");
   host = document.createElement("div");
@@ -30,6 +30,13 @@ afterEach(async () => {
 });
 
 describe("language selection before sign-in", () => {
+  it("uses the deployment logo and falls back when it cannot load", async () => {
+    const logo = host.querySelector<HTMLImageElement>(".login-brand img")!;
+    expect(logo.getAttribute("src")).toBe("https://cdn.example.com/logo.png");
+    expect(logo.getAttribute("referrerpolicy")).toBe("no-referrer");
+    await act(async () => logo.dispatchEvent(new Event("error")));
+    expect(logo.getAttribute("src")).toContain("/img/webmail.svg");
+  });
   it("changes labels and the document language, then switches back", async () => {
     const select = host.querySelector<HTMLSelectElement>("#login-language")!;
     expect(select).toBeTruthy();

@@ -344,7 +344,7 @@ export const DEFAULT_SETTINGS: Settings = {
   attachmentReminder: true,
   weekStart: 1,
   locale: "",
-  uiLanguage: "en",
+  uiLanguage: "vi",
   dateFormat: "auto",
   timeFormat: "auto",
   calendarDefaultView: "week",

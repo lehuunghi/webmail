@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hướng dẫn cài đặt · Webmail</title><link rel="stylesheet" href="huong-dan.css"></head>
+<body><header><a href="./">← Webmail</a><span>Hướng dẫn triển khai · lehuunghi</span></header><main><nav aria-label="Mục lục"><strong>Mục lục</strong><a href="#chuan-bi">1. Chuẩn bị</a><a href="#docker">2. Docker riêng</a><a href="#portainer">3. Portainer</a><a href="#cpanel">4. Hosting cPanel</a><a href="#kiem-tra">5. Kiểm tra & lỗi</a><a href="#logo">6. Đổi logo</a><a href="#cloudflare">7. Cloudflare</a><a href="#sao-luu">8. Sao lưu</a><a class="source-link" href="https://github.com/lehuunghi/webmail/tree/codex/vietnamese-default-deployment-guide">Xem mã nguồn ↗</a></nav><article><h1>Cài đặt Webmail của lehuunghi</h1>
+<p>Mã nguồn: <a href="https://github.com/lehuunghi/webmail">https://github.com/lehuunghi/webmail</a>. Giao diện mới mặc định là tiếng Việt; lựa chọn ngôn ngữ đã lưu của người dùng vẫn được giữ. Có thể đổi tên bằng <code>APP_NAME</code>. Đây là <strong>ứng dụng đọc thư JMAP</strong>, cần máy chủ <strong>Stalwart 0.16 trở lên</strong> đang hoạt động. Nó không tự cung cấp SMTP, IMAP hay tạo hộp thư. Tạo tài khoản, tên miền và DNS gửi/nhận thư trên Stalwart trước.</p>
+<p>Hướng dẫn đối chiếu với mã nguồn và tài liệu nhà cung cấp ngày <strong>02/10/2026</strong>. Các địa chỉ <code>example.com</code>, CPANEL_USER và chuỗi bí mật trong ví dụ phải thay bằng thông tin thật. Các bước triển khai trên dịch vụ thật chưa được chạy trong quá trình soạn tài liệu này.</p>
+<blockquote>
+<p><strong>Chọn cách cài:</strong> có VPS/Docker → phần 2; quản lý bằng Portainer → phần 3; hosting có Node.js → phần 4; muốn dùng tên miền và HTTPS của Cloudflare mà không mở cổng vào VPS → phần 7. Cloudflare Tunnel vẫn cần máy chạy ứng dụng. Cloudflare Containers là hướng triển khai trực tiếp cần tích hợp thêm; Pages/Workers chưa chạy nguyên repo này.</p>
+</blockquote>
+<h3>Lấy đúng bản mã nguồn</h3>
+<p>Trong lúc PR #1 chưa được merge, giao diện tiếng Việt, logo URL và các file hướng dẫn mới nằm ở nhánh <code>codex/vietnamese-default-deployment-guide</code>. Các lệnh clone bên dưới lấy nhánh này. Sau khi merge vào <code>main</code>, có thể clone <code>main</code> cho bản chính thức. Trước khi cập nhật, kiểm tra <code>git branch --show-current</code> và <code>git log -1 --oneline</code>; không đổi nhánh trên bản chạy đang có thay đổi riêng chưa sao lưu.</p>
+<h2 id="chuan-bi">1. Chuẩn bị chung</h2>
+<ul>
+<li>Tên miền giao diện, ví dụ <code>webmail.example.com</code>, trỏ đến máy chạy ứng dụng.</li>
+<li>Địa chỉ Stalwart, ví dụ <code>https://jmail.vn</code>, có chứng chỉ TLS hợp lệ. Từ máy chạy Webmail phải truy cập được <code>https://jmail.vn/.well-known/jmap</code>.</li>
+<li>HTTPS cho giao diện (AutoSSL cPanel hoặc reverse proxy Caddy/Nginx). Khi đặt <code>TRUST_PROXY=1</code>, cookie đăng nhập yêu cầu HTTPS.</li>
+<li>Tạo bí mật riêng bằng <code>openssl rand -base64 48</code>. Giữ nguyên bí mật khi cập nhật; không đưa <code>.env</code> vào Git.</li>
+<li>Máy build cần Node.js <strong>22.12 trở lên hoặc 24 LTS</strong> và npm. Chỉ thỏa <code>&gt;=20.19</code> trong package.json chưa đủ cho các công cụ build hiện tại. Dockerfile sử dụng Node 26.</li>
+<li>Nếu dùng đường dẫn <code>/mail</code> thay vì tên miền riêng: đặt <code>BASE_PATH=/mail</code> <strong>cả lúc build và lúc chạy</strong>, reverse proxy giữ nguyên tiền tố. Các ví dụ dưới đây dùng tên miền riêng ở đường dẫn <code>/</code>.</li>
+</ul>
+<h3>Kiểm tra trước khi cài</h3>
+<p>Chạy từ máy sẽ đặt Webmail:</p>
+<pre><code class="language-sh">curl -I https://jmail.vn/.well-known/jmap
+</code></pre>
+<p>Phản hồi 401 khi chưa xác thực có thể là bình thường. Lỗi DNS, timeout hoặc lỗi chứng chỉ phải xử lý trước. Không dùng <code>curl -k</code> để coi lỗi chứng chỉ là đã giải quyết. <code>STALWART_URL</code> là URL gốc, không thêm <code>/jmap</code>, <code>/.well-known/jmap</code> hoặc đường dẫn admin. Tài khoản đăng nhập phải là tài khoản đã tạo trên Stalwart.</p>
+<table>
+<thead>
+<tr>
+<th>Biến</th>
+<th>Cách dùng trong bản này</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>STALWART_URL</code></td>
+<td>Mặc định <code>https://jmail.vn</code>; đổi nếu dùng máy chủ JMAP khác</td>
+</tr>
+<tr>
+<td><code>APP_SECRET</code></td>
+<td>Bắt buộc ở production; tạo ngẫu nhiên, giữ nguyên qua các lần cập nhật</td>
+</tr>
+<tr>
+<td><code>APP_NAME</code></td>
+<td>Tên hiển thị; mặc định Webmail</td>
+</tr>
+<tr>
+<td><code>APP_LOGO_URL</code></td>
+<td>URL trực tiếp tới ảnh hoặc đường dẫn nội bộ; để trống dùng logo mặc định</td>
+</tr>
+<tr>
+<td><code>TRUST_PROXY</code></td>
+<td><code>1</code> khi nằm sau proxy HTTPS do bạn quản lý; local HTTP thử nghiệm dùng <code>0</code></td>
+</tr>
+<tr>
+<td><code>SECURE_COOKIES</code></td>
+<td>Production HTTPS có thể đặt <code>1</code>; không đặt <code>0</code> để chữa lỗi đăng nhập trên production</td>
+</tr>
+<tr>
+<td><code>SESSION_FILE</code></td>
+<td>File lưu phiên; Dockerfile dùng <code>/data/sessions.json</code>, cPanel dùng đường dẫn ngoài public_html</td>
+</tr>
+<tr>
+<td><code>STATIC_DIR</code></td>
+<td>Docker đã đặt sẵn; cPanel nên đặt đường dẫn tuyệt đối tới <code>web/dist</code></td>
+</tr>
+<tr>
+<td><code>BASE_PATH</code></td>
+<td>Để trống với subdomain riêng; có tiền tố thì phải truyền vào cả build và runtime</td>
+</tr>
+<tr>
+<td><code>MAX_UPLOAD_BYTES</code></td>
+<td>Mặc định 52428800 (50 MiB); còn chịu giới hạn Stalwart/proxy/hosting</td>
+</tr>
+</tbody></table>
+<p>Compose chỉ truyền các biến được khai báo trong <code>environment</code>; thêm biến vào <code>.env</code> chưa đủ nếu YAML không tham chiếu nó. Ngược lại, server Node nạp <code>.env</code> từ thư mục làm việc hoặc thư mục dự án và ưu tiên biến môi trường đã có. Frontend build với tiền tố cần <code>BASE_PATH=/mail npm run build</code>; không chỉ sửa <code>.env</code> ở thư mục gốc rồi mặc định Vite đã nhận.</p>
+<h2 id="docker">2. Docker riêng: build từ repo của bạn</h2>
+<p>Trên VPS Linux đã cài Docker Engine và Compose plugin:</p>
+<pre><code class="language-sh">git clone --branch codex/vietnamese-default-deployment-guide https://github.com/lehuunghi/webmail.git
+cd webmail
+cp .env.example .env
+chmod 600 .env
+openssl rand -base64 48
+</code></pre>
+<p>Sửa <code>.env</code>, tối thiểu:</p>
+<pre><code class="language-dotenv">STALWART_URL=https://jmail.vn
+APP_SECRET=THAY_BANG_BI_MAT_VUA_TAO
+APP_NAME=Webmail
+APP_LOGO_URL=
+SOURCE_URL=https://github.com/lehuunghi/webmail
+TRUST_PROXY=1
+</code></pre>
+<p>Build và khởi động bản riêng (không tải image của dự án gốc):</p>
+<pre><code class="language-sh">docker compose build --pull
+docker compose up -d
+docker compose ps
+docker compose logs --tail=100 webmail
+curl http://127.0.0.1:8080/api/health
+</code></pre>
+<p>Image được tạo có tên <code>lehuunghi/webmail:local</code>. <code>/data</code> được lưu trong volume <code>webmail-data</code> (Compose có thể thêm tiền tố tên dự án). Đừng xóa volume khi cập nhật. Nếu chạy nhiều bản, mỗi bản dùng volume và bí mật riêng.</p>
+<p>Health phải trả JSON có <code>ok: true</code>; <code>docker compose ps</code> phải có trạng thái healthy. Health chỉ xác nhận Webmail chạy, chưa chứng minh kết nối Stalwart/gửi thư thành công. Nếu hiện lỗi quyền ghi <code>/data</code>, kiểm tra volume và user <code>node</code> của image; không dùng <code>chmod 777</code> để bỏ qua lỗi. Trước khi chạy có thể dùng <code>docker compose config --quiet</code> để kiểm tra YAML mà không in toàn bộ bí mật.</p>
+<h3>HTTPS bằng Caddy trên cùng VPS</h3>
+<p>Trỏ DNS trước, mở cổng 80/443. Với Caddy cài trực tiếp trên host, thêm:</p>
+<pre><code class="language-caddyfile">webmail.example.com {
+    reverse_proxy 127.0.0.1:8080
+}
+</code></pre>
+<p>Reload Caddy rồi mở <code>https://webmail.example.com</code>. Cổng 8080 chỉ bind loopback. Nếu proxy cũng chạy Docker, kết nối hai container vào cùng mạng và proxy tới <code>webmail:8080</code>; <code>127.0.0.1</code> trong container proxy là chính container đó. Không cần công khai cổng 8080. Nginx cần chuyển <code>Host</code>, <code>X-Forwarded-Proto</code>, <code>X-Forwarded-For</code>; tắt buffering cho kết nối sự kiện nếu cập nhật thư bị chậm.</p>
+<p>Ví dụ phần location của Nginx (chứng chỉ và server_name cấu hình cho tên miền của bạn):</p>
+<pre><code class="language-nginx">location / {
+    proxy_pass http://127.0.0.1:8080;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_buffering off;
+    proxy_read_timeout 3600s;
+    client_max_body_size 60m;
+}
+</code></pre>
+<p>Ví dụ này dành cho Nginx trực tiếp kết thúc TLS. Nếu còn một proxy phía trước, phải cấu hình lại cách tin cậy IP/protocol cho đúng chuỗi proxy. Với Docker, mặc định server tin IP loopback/private; khi topology khác, đặt <code>TRUSTED_PROXIES</code> theo IP/CIDR thực sự của proxy, không mở tin mọi địa chỉ.</p>
+<h3>Cập nhật và quay lui</h3>
+<pre><code class="language-sh">docker tag lehuunghi/webmail:local lehuunghi/webmail:previous
+git pull --ff-only
+docker compose build --pull
+docker compose up -d
+</code></pre>
+<p>Kiểm tra health và đăng nhập. Nếu cần quay lui: <code>docker tag lehuunghi/webmail:previous lehuunghi/webmail:local</code>, rồi <code>docker compose up -d --force-recreate --no-build</code>. Giữ <code>.env</code>, APP_SECRET và volume. Trước thay đổi lớn, sao lưu volume khi ứng dụng đã dừng; dữ liệu thư thật nằm trên Stalwart, cần sao lưu riêng.</p>
+<p>Chỉ chạy tag <code>previous</code> sau khi đã có image <code>local</code> cũ trên host. Khi khôi phục từ backup cần giữ cả file phiên và APP_SECRET tương ứng. Không dùng <code>docker compose down -v</code> vì lệnh đó xóa volume phiên. Dùng cùng thư mục/tên project Compose để tránh tạo một volume mới rồi tưởng phiên bị mất.</p>
+<h2 id="portainer">3. Portainer (Docker Standalone)</h2>
+<p>Hướng dẫn này dùng môi trường <strong>Docker Standalone</strong>, không phải Swarm. Image phải tồn tại trên <strong>đúng Docker host mà Portainer quản lý</strong>.</p>
+<ol>
+<li>SSH vào Docker host đó; clone repo và chạy <code>docker build --pull -t lehuunghi/webmail:local .</code> từ thư mục repo. Nếu build trên máy khác, chuyển image bằng <code>docker save</code> / <code>docker load</code>, hoặc push lên registry của bạn. Tag <code>:local</code> không phải image đã được xuất bản sẵn trên Docker Hub.</li>
+<li>Trong Portainer chọn Environment đúng → <strong>Stacks → Add stack</strong>. Đặt tên <code>webmail</code>.</li>
+<li>Chọn <strong>Web editor</strong>, dán nội dung <code>docker-compose.portainer.yml</code> của repo. File này dùng image đã build nên không cần build context trong Web editor.</li>
+<li>Trong <strong>Environment variables</strong>, thêm <code>STALWART_URL</code> và <code>APP_SECRET</code>; nếu dùng registry/tag khác thêm <code>WEBMAIL_IMAGE</code>. Không bật buộc pull image khi đang dùng image local.</li>
+<li>Chọn <strong>Deploy the stack</strong>. Mở Containers → container webmail → Logs và kiểm tra trạng thái health. Nếu cổng 8080 đã dùng, thay phần host trong mapping thành <code>127.0.0.1:8081:8080</code> và sửa proxy tương ứng.</li>
+<li>Cấu hình HTTPS như phần Docker. Với Nginx Proxy Manager chạy Docker, dùng mạng chung (thêm external network vào stack), hostname upstream là tên service/container trên mạng đó, cổng 8080. Đừng dùng loopback của host làm upstream từ container.</li>
+<li>Khi cập nhật, build lại trên host đúng hoặc push tag phiên bản mới. Đổi <code>WEBMAIL_IMAGE</code> sang tag mới trong stack rồi redeploy. Với image local giữ cùng tag, recreate container sau build; không chọn pull từ registry. Giữ volume và APP_SECRET.</li>
+</ol>
+<p>Có thể dùng Repository thay cho Web editor với <code>docker-compose.yml</code> nếu môi trường Portainer hỗ trợ build từ Git. Cách image đã build ở trên dễ kiểm tra hơn và không phụ thuộc hỗ trợ build của Portainer.</p>
+<p><a href="https://github.com/lehuunghi/webmail/blob/codex/vietnamese-default-deployment-guide/docker-compose.portainer.yml">Mở file YAML Portainer</a>. Trong bản HTML, nội dung hiện dưới đây để sao chép:</p>
+<pre><code class="language-yaml"># Build the image on the target Docker host first (see docs/CAI-DAT.md).
+# Portainer Web editor uses this stack without needing a source directory.
+services:
+  webmail:
+    image: ${WEBMAIL_IMAGE:-lehuunghi/webmail:local}
+    restart: unless-stopped
+    ports:
+      - &quot;127.0.0.1:8080:8080&quot;
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      STALWART_URL: ${STALWART_URL:-https://jmail.vn}
+      APP_SECRET: ${APP_SECRET:?set APP_SECRET}
+      APP_NAME: Webmail
+      APP_LOGO_URL: ${APP_LOGO_URL:-}
+      SOURCE_URL: https://github.com/lehuunghi/webmail
+      TRUST_PROXY: &quot;1&quot;
+      IMAGE_PROXY: &quot;1&quot;
+    volumes:
+      - webmail-data:/data
+volumes:
+  webmail-data:
+</code></pre>
+<h3>Điền biến trong Portainer</h3>
+<table>
+<thead>
+<tr>
+<th>Tên</th>
+<th>Ví dụ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>STALWART_URL</code></td>
+<td><code>https://jmail.vn</code></td>
+</tr>
+<tr>
+<td><code>APP_SECRET</code></td>
+<td>Giá trị tạo bằng openssl; không dùng nguyên chuỗi minh họa</td>
+</tr>
+<tr>
+<td><code>WEBMAIL_IMAGE</code></td>
+<td><code>lehuunghi/webmail:local</code> hoặc tag registry riêng đã build</td>
+</tr>
+<tr>
+<td><code>APP_LOGO_URL</code></td>
+<td><code>https://cdn.example.com/logo.png</code>, hoặc bỏ trống</td>
+</tr>
+</tbody></table>
+<p>Stack thông thường đang đặt <code>APP_NAME: Webmail</code> trong YAML; muốn đổi tên thì sửa dòng này hoặc đổi thành <code>${APP_NAME:-Webmail}</code> và khai báo thêm biến. Sau deploy, vào Containers chọn container webmail → Inspect/Logs để xác nhận image đúng và không có lỗi startup. Với registry riêng, cấu hình quyền pull trong Portainer trước. Với image local, kiểm tra host bằng <code>docker image inspect lehuunghi/webmail:local</code> trước deploy.</p>
+<p>Để dùng Cloudflare Tunnel trong Portainer, thay YAML bằng <code>docker-compose.cloudflare.yml</code> và thêm <code>TUNNEL_TOKEN</code>, rồi thực hiện phần 7. Không deploy thêm một stack khác dùng cùng hostname mà không xác định rõ stack nào giữ dữ liệu phiên.</p>
+<h2 id="cpanel">4. Node.js trên hosting cPanel</h2>
+<p>Hosting phải hỗ trợ Node.js/Passenger (Application Manager hoặc CloudLinux <strong>Setup Node.js App</strong>), SSH/Terminal, biến môi trường, kết nối HTTPS ra Stalwart và tiến trình Node lâu dài. Hosting PHP thông thường không chạy được ứng dụng này. Hỏi nhà cung cấp về Node 22.12+/24 LTS và SSE/WebSocket nếu sự kiện cập nhật bị chặn. Không cài Docker vào shared hosting.</p>
+<h3>4.1 Tải và build</h3>
+<p>Dùng thư mục ngoài <code>public_html</code>, ví dụ <code>/home/CPANEL_USER/webmail</code>:</p>
+<pre><code class="language-sh">cd ~
+git clone --branch codex/vietnamese-default-deployment-guide https://github.com/lehuunghi/webmail.git
+cd webmail
+node --version
+npm ci
+npm run build
+mkdir -p data tmp
+chmod 700 data
+openssl rand -base64 48
+</code></pre>
+<p>Nếu hosting không đủ RAM hoặc thiếu Node phù hợp để build, build trên máy Linux khác rồi tải lên <code>web/dist</code>, <code>server/dist</code>, <code>scripts</code>, <code>app.cjs</code>, các package.json và package-lock.json; sau đó chạy <code>npm ci --omit=dev --workspace server</code> trên hosting. Không tải node_modules của Windows lên Linux.</p>
+<p>Trước khi thuê hoặc cài, hỏi nhà cung cấp: có Node 22.12+/24 LTS, chạy CommonJS startup <code>app.cjs</code>, biến môi trường riêng, tiến trình lâu dài, hỗ trợ stream HTTP và quyền kết nối HTTPS tới Stalwart không? Nếu chỉ có Node 16/18 hoặc chỉ hosting PHP, chọn VPS/Docker. Mức RAM build phụ thuộc giới hạn hosting; khi bị kill/OOM, build nơi khác thay vì lặp lại trên cùng gói.</p>
+<p>Các đường dẫn cần có sau build: <code>web/dist/index.html</code>, <code>server/dist/index.js</code>, <code>scripts/version.mjs</code>, <code>scripts/basePath.mjs</code>, <code>app.cjs</code>. Thư mục <code>scripts</code> cần ở runtime vì server import các module này. Upload cả <code>server/package.json</code> và root package-lock/package.json trước khi cài dependency production.</p>
+<h3>4.2 Tạo ứng dụng</h3>
+<ol>
+<li>Tạo subdomain <code>webmail.example.com</code>, bật AutoSSL và buộc HTTPS.</li>
+<li>Trong <strong>Setup Node.js App</strong>, chọn Node phù hợp, mode Production, application root <code>webmail</code>, URL subdomain, startup file <strong>app.cjs</strong>. Repo cung cấp file này để Passenger nạp được CommonJS và khởi động server ESM đã build.</li>
+<li>Nếu dùng <strong>Application Manager</strong> của cPanel chuẩn: đăng ký application path <code>/home/CPANEL_USER/webmail</code>; nhờ nhà cung cấp cấu hình <code>PassengerStartupFile app.cjs</code> trong cấu hình Passenger theo tài liệu cPanel. Giao diện này có thể không có ô startup file. Không sửa tên server/dist/index.js tùy ý.</li>
+<li>Thêm các biến sau trong giao diện quản lý ứng dụng; thay CPANEL_USER và địa chỉ Stalwart:</li>
+</ol>
+<pre><code class="language-dotenv">NODE_ENV=production
+STALWART_URL=https://jmail.vn
+APP_SECRET=BI_MAT_NGAU_NHIEN_CUA_BAN
+APP_NAME=Webmail
+APP_LOGO_URL=
+SOURCE_URL=https://github.com/lehuunghi/webmail
+STATIC_DIR=/home/CPANEL_USER/webmail/web/dist
+SESSION_FILE=/home/CPANEL_USER/webmail/data/sessions.json
+TRUST_PROXY=1
+IMAGE_PROXY=1
+</code></pre>
+<p>Server có thể nạp <code>.env</code> từ thư mục ứng dụng; biến môi trường thật được ưu tiên. Trên cPanel, nên nhập biến vào phần Environment variables để Passenger nhận đúng cấu hình. Để Passenger quản lý socket/cổng, không ép PORT nếu nhà cung cấp không yêu cầu. APP_SECRET phải đủ mạnh; server sẽ từ chối khởi động production khi thiếu.</p>
+<ol start="5">
+<li>Start/Restart app. Nếu có môi trường ảo CloudLinux, chạy lệnh kích hoạt môi trường mà cPanel hiển thị trước khi chạy npm.</li>
+<li>Mở <code>https://webmail.example.com/api/health</code>, rồi đăng nhập bằng tài khoản Stalwart. Trang đăng nhập phải có “Tiếng Việt” và “Đăng nhập”. Thử gửi/nhận một thư bằng tài khoản thật.</li>
+</ol>
+<p>Nếu giao diện cPanel mới có <strong>Web Apps</strong> thay vì Application Manager, đăng ký repo/thư mục và cấu hình runtime, startup, biến môi trường tương đương theo nhà cung cấp. Đây không phải các tên menu giống nhau trên mọi hosting. Cấu hình <code>PassengerStartupFile</code> ở cấp Apache cần nhà cung cấp/WHM, không chạy lệnh root trong tài khoản shared hosting.</p>
+<p>Khi lỗi 503, đọc log ứng dụng trong cPanel và kiểm tra lần lượt: Node version, startup <code>app.cjs</code>, dependency, dist, APP_SECRET, quyền đọc mã và quyền ghi <code>data</code>. <code>.env</code> để ngoài thư mục công khai, quyền 600. File data thuộc tài khoản cPanel đang chạy ứng dụng. Không mở process Node thủ công song song với Passenger trên cùng port để chữa lỗi.</p>
+<h3>4.3 Cập nhật cPanel</h3>
+<p>Sao lưu mã nguồn phiên bản cũ, <code>data</code> và ghi lại các biến. Chạy <code>git pull --ff-only</code>, <code>npm ci</code>, <code>npm run build</code>, sau đó Restart trong cPanel. Với Passenger có thể chạy <code>mkdir -p tmp &amp;&amp; touch tmp/restart.txt</code>. Kiểm tra health, đăng nhập, tài liệu và log lỗi. Không đưa APP_SECRET vào thư mục web công khai.</p>
+<h2 id="kiem-tra">5. Kiểm tra và xử lý lỗi</h2>
+<table>
+<thead>
+<tr>
+<th>Hiện tượng</th>
+<th>Kiểm tra</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>502/503</td>
+<td>Tiến trình Node, log Passenger/Portainer, startup app.cjs và thư mục dist đã build</td>
+</tr>
+<tr>
+<td>Không đăng nhập</td>
+<td>URL Stalwart, tài khoản/mật khẩu thật, TLS hợp lệ, JMAP bật, Stalwart &gt;=0.16</td>
+</tr>
+<tr>
+<td>Đăng nhập xong lại bị thoát</td>
+<td>HTTPS, X-Forwarded-Proto, TRUST_PROXY, APP_SECRET cố định, quyền ghi data</td>
+</tr>
+<tr>
+<td>Giao diện trắng/404 assets</td>
+<td>BASE_PATH lúc build và chạy phải trùng; tránh cache bundle cũ</td>
+</tr>
+<tr>
+<td>Portainer báo pull denied</td>
+<td>Image :local phải build/load trên đúng host; tắt pull hoặc dùng registry/tag đã push</td>
+</tr>
+<tr>
+<td>Không thấy thư mới ngay</td>
+<td>Reverse proxy buffering/timeouts và hosting hỗ trợ luồng sự kiện; thử tải lại</td>
+</tr>
+<tr>
+<td>Logo không đổi</td>
+<td>Kiểm tra <code>/api/config</code> có logoUrl mới; recreate/restart; URL ảnh trực tiếp và HTTPS; logo lỗi dùng ảnh mặc định</td>
+</tr>
+<tr>
+<td>Cloudflare 502</td>
+<td>Tunnel route sai: cloudflared trong Docker phải tới <code>http://webmail:8080</code>, không phải localhost</td>
+</tr>
+<tr>
+<td>Cloudflare 1033</td>
+<td>Connector chưa kết nối; xem log cloudflared, token và kết nối outbound</td>
+</tr>
+<tr>
+<td>Cloudflare 526 khi proxy DNS</td>
+<td>Origin certificate/tên miền/hạn dùng; cấu hình Full (strict) với chứng chỉ hợp lệ</td>
+</tr>
+<tr>
+<td>413 khi tải đính kèm</td>
+<td>Đối chiếu MAX_UPLOAD_BYTES, Stalwart, client_max_body_size và giới hạn nhà cung cấp</td>
+</tr>
+<tr>
+<td>403 ở API</td>
+<td>Truy cập cùng origin, cookie hợp lệ; kiểm tra rule Cloudflare/Access và request, không tắt CSRF</td>
+</tr>
+</tbody></table>
+<h3>Kiểm tra nghiệm thu sau mọi cách cài</h3>
+<ol>
+<li>Truy cập URL HTTPS thật, xác nhận chứng chỉ đúng tên miền và health trả <code>ok: true</code>.</li>
+<li>Đăng nhập tài khoản Stalwart thật; mở một thư và tải một file đính kèm.</li>
+<li>Gửi thư thử tới địa chỉ bạn kiểm soát; kiểm tra thư đến, thư đã gửi và nhận thư trả lời.</li>
+<li>Thử Lịch, Danh bạ, Tệp và các quyền tài khoản có hỗ trợ.</li>
+<li>Kiểm tra mobile, logout/login; không có hai liên kết hướng dẫn/mã nguồn trên login.</li>
+<li>Restart ứng dụng; phiên đánh dấu thiết bị riêng phải được giữ nếu SESSION_FILE, volume và APP_SECRET được cấu hình đúng. Thiết bị dùng chung có chính sách phiên ngắn hơn.</li>
+<li>Ghi lại commit/tag, cấu hình, vị trí backup và cách quay lui. Lưu log đã che dữ liệu nhạy cảm nếu nhờ hỗ trợ.</li>
+</ol>
+<p>Kiểm thử demo dùng <code>npm run mock</code> và STALWART_URL <code>http://127.0.0.1:8788</code>, tài khoản <code>demo@example.com</code> / mật khẩu <code>demo</code>. Chỉ dùng trong môi trường thử nghiệm, không triển khai demo công khai. Test demo không thay thế kiểm thử Stalwart và hosting thật.</p>
+<h2>Tài liệu đối chiếu</h2>
+<ul>
+<li>cPanel: <a href="https://docs.cpanel.net/knowledge-base/web-services/how-to-install-a-node.js-application/">https://docs.cpanel.net/knowledge-base/web-services/how-to-install-a-node.js-application/</a></li>
+<li>Startup file Passenger: <a href="https://support.cpanel.net/hc/en-us/articles/360057519553-How-to-create-a-custom-NodeJS-startup-file">https://support.cpanel.net/hc/en-us/articles/360057519553-How-to-create-a-custom-NodeJS-startup-file</a></li>
+<li>Portainer stacks: <a href="https://docs.portainer.io/user/docker/stacks/add">https://docs.portainer.io/user/docker/stacks/add</a></li>
+<li>Docker Compose: <a href="https://docs.docker.com/compose/">https://docs.docker.com/compose/</a></li>
+</ul>
+<p>Giữ LICENSE và NOTICE trong bản phân phối. Mã nguồn phiên bản này được cung cấp tại repo lehuunghi/webmail; màn hình login và settings/about không còn liên kết giới thiệu/mã nguồn.</p>
+<h2 id="logo">6. Đổi logo riêng</h2>
+<p>Đặt trong <code>.env</code>:</p>
+<pre><code class="language-dotenv">APP_NAME=Webmail của tôi
+APP_LOGO_URL=https://cdn.example.com/logo.png
+</code></pre>
+<p>Có thể dùng đường dẫn nội bộ như <code>/img/logo-rieng.svg</code> (file đặt trong <code>web/public/img</code> rồi build lại). Nếu dùng BASE_PATH, đường dẫn ảnh nội bộ phải chứa tiền tố thật, ví dụ <code>/mail/img/logo-rieng.svg</code>. Để trống sẽ dùng logo Webmail mặc định. Logo áp dụng cho login, thanh đầu trang và vùng đọc thư; ảnh lỗi sẽ tự quay về logo mặc định. Nên dùng PNG, WebP hoặc SVG, nền trong suốt và URL HTTPS trỏ trực tiếp tới ảnh. URL không được yêu cầu cookie đăng nhập ở một trang khác; không nhập URL trang xem ảnh hoặc data URL.</p>
+<p>Docker Compose tự truyền APP_LOGO_URL từ .env; Portainer nhập biến này trong Environment variables của stack; cPanel nhập vào Environment variables của ứng dụng. Sau khi đổi URL, restart/recreate ứng dụng và tải lại trang. Đây là logo chung của bản cài đặt, không phải tùy chọn riêng của từng tài khoản. Favicon và icon cài ứng dụng vẫn dùng bộ icon mặc định.</p>
+<p>Với Docker: <code>docker compose up -d --force-recreate</code> để nhận biến mới. URL ảnh ngoài được thêm vào CSP theo đường dẫn cấu hình; nếu URL chuyển hướng sang nơi khác có thể bị chặn, nên dùng URL đích trực tiếp. Không cần build lại khi chỉ đổi URL ngoài; thay file trong web/public thì cần build lại image/bundle.</p>
+<h2 id="cloudflare">7. Cloudflare: cách triển khai phù hợp</h2>
+<h3>7.1 Phân biệt các dịch vụ</h3>
+<table>
+<thead>
+<tr>
+<th>Dịch vụ</th>
+<th>Với bản Webmail hiện tại</th>
+<th>Có cần máy chủ riêng?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DNS/proxy Cloudflare</td>
+<td>Đặt trước VPS/cPanel đang chạy, origin cần HTTPS hợp lệ</td>
+<td>Có</td>
+</tr>
+<tr>
+<td>Cloudflare Tunnel</td>
+<td>Đưa Docker/Node đang chạy ra hostname qua cloudflared; không cần mở cổng inbound cho webmail</td>
+<td>Có, máy luôn bật và có mạng</td>
+</tr>
+<tr>
+<td>Cloudflare Pages</td>
+<td>Chỉ tải web/dist không đủ: frontend gọi /api, cần backend và cùng origin</td>
+<td>Cần backend riêng hoặc viết adapter</td>
+</tr>
+<tr>
+<td>Cloudflare Workers</td>
+<td>Có một phần tương thích Node; repo chưa có entrypoint và lớp lưu phiên cho Workers</td>
+<td>Phải chuyển đổi backend</td>
+</tr>
+<tr>
+<td>Cloudflare Containers</td>
+<td>Có môi trường container Linux, khả thi để chạy image; phải thêm Worker/Durable Object, routing và lưu phiên</td>
+<td>Không cần VPS cho Webmail, nhưng Stalwart vẫn phải ở nơi khác</td>
+</tr>
+</tbody></table>
+<p>Đánh giá Pages/Workers ở đây là kết luận từ kiến trúc repo: server dùng tiến trình Node, file tĩnh, phiên trong bộ nhớ và file phiên. Không phải khẳng định Cloudflare hoàn toàn không hỗ trợ Node. Workers có Node compatibility, nhưng file tạm không phải ổ đĩa bền vững. Repo chưa có wrangler config hoặc adapter lưu phiên trên Durable Objects/D1.</p>
+<p>Nguồn: <a href="https://developers.cloudflare.com/pages/functions/get-started/">Pages Functions</a>, <a href="https://developers.cloudflare.com/workers/runtime-apis/nodejs/">Node compatibility</a>, <a href="https://developers.cloudflare.com/changelog/post/2025-08-15-nodejs-fs/">filesystem Workers</a>, <a href="https://developers.cloudflare.com/containers/">Containers</a>.</p>
+<h3>7.2 Docker + Cloudflare Tunnel: hướng dẫn từng bước</h3>
+<p>Sơ đồ: <strong>Trình duyệt HTTPS → Cloudflare → cloudflared trên máy của bạn → webmail:8080 → Stalwart qua HTTPS</strong>. Webmail và cloudflared dùng cùng mạng Compose. Stack này không publish cổng 8080 ra host, nên không dùng curl loopback của phần 2 để kiểm tra nó.</p>
+<p><strong>Bước 1 — Chuẩn bị:</strong> tên miền đã quản lý DNS tại Cloudflare, máy Docker luôn bật, Stalwart truy cập được. Clone đúng nhánh ở phần 2, tạo <code>.env</code>, điền STALWART_URL/APP_SECRET và build image:</p>
+<pre><code class="language-sh">docker build --pull -t lehuunghi/webmail:local .
+</code></pre>
+<p><strong>Bước 2 — Tạo tunnel:</strong> trong dashboard Cloudflare tìm Tunnels (tùy giao diện ở Networking hoặc Cloudflare One/Networks/Connectors), tạo Cloudflared tunnel, đặt tên. Ở hướng dẫn cài connector chọn Docker và lấy chuỗi token <code>eyJ...</code>. Chỉ dùng token tunnel, không dùng Global API Key. Thêm vào <code>.env</code>:</p>
+<pre><code class="language-dotenv">TUNNEL_TOKEN=THAY_BANG_TOKEN_TUNNEL_CUA_BAN
+</code></pre>
+<p>Token cho phép chạy connector của tunnel; giữ file <code>.env</code> riêng, không đưa vào repo hoặc ảnh chụp. <a href="https://developers.cloudflare.com/tunnel/reference/tunnel-tokens/">Hướng dẫn token chính thức</a>.</p>
+<p><strong>Bước 3 — Khởi chạy:</strong> sử dụng <code>docker-compose.cloudflare.yml</code> trong repo:</p>
+<p><a href="https://github.com/lehuunghi/webmail/blob/codex/vietnamese-default-deployment-guide/docker-compose.cloudflare.yml">Mở file YAML Cloudflare</a>. Trong bản HTML, nội dung hiện dưới đây để sao chép:</p>
+<pre><code class="language-yaml"># Build lehuunghi/webmail:local on this host before starting this stack.
+# In Cloudflare, route webmail.example.com to http://webmail:8080.
+services:
+  webmail:
+    image: ${WEBMAIL_IMAGE:-lehuunghi/webmail:local}
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      STALWART_URL: ${STALWART_URL:-https://jmail.vn}
+      APP_SECRET: ${APP_SECRET:?set APP_SECRET}
+      APP_NAME: ${APP_NAME:-Webmail}
+      APP_LOGO_URL: ${APP_LOGO_URL:-}
+      SOURCE_URL: ${SOURCE_URL:-https://github.com/lehuunghi/webmail}
+      TRUST_PROXY: &quot;1&quot;
+      SECURE_COOKIES: &quot;1&quot;
+      IMAGE_PROXY: &quot;1&quot;
+    volumes:
+      - webmail-data:/data
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?set the remotely managed tunnel token}
+    depends_on:
+      webmail:
+        condition: service_healthy
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  webmail-data:
+</code></pre>
+<pre><code class="language-sh">docker compose -f docker-compose.cloudflare.yml config --quiet
+docker compose -f docker-compose.cloudflare.yml up -d
+docker compose -f docker-compose.cloudflare.yml ps
+docker compose -f docker-compose.cloudflare.yml logs --tail=80 webmail cloudflared
+</code></pre>
+<p>Phải thấy webmail healthy, connector báo kết nối. Nếu thử chuyển từ cách cài cũ, dừng stack cũ trước, giữ cùng tên project/volume và kiểm tra cấu hình thay vì khởi chạy hai Webmail cùng ghi một file phiên. Chỉ chọn một YAML cho bản chạy.</p>
+<p><strong>Bước 4 — Tạo Published application route:</strong> trên tunnel vừa tạo, thêm hostname <code>webmail.example.com</code>, service type <strong>HTTP</strong>, URL <strong>webmail:8080</strong> (đầy đủ là <code>http://webmail:8080</code>). Không dùng <code>localhost:8080</code> khi cloudflared chạy trong container riêng. Dashboard tạo DNS route tương ứng; xử lý bản ghi hostname cũ nếu báo trùng.</p>
+<p><strong>Bước 5 — Mở HTTPS và kiểm tra:</strong> truy cập <code>https://webmail.example.com/api/health</code>, rồi nghiệm thu theo phần 5. Stack đã đặt TRUST_PROXY=1, SECURE_COOKIES=1. HTTP chỉ ở mạng nội bộ tới service; người dùng truy cập HTTPS. Nếu cần Caddy/AutoSSL, đó là cách proxy trực tiếp ở phần 2/4, không phải điều kiện bắt buộc cho HTTP service bên trong tunnel này.</p>
+<p><strong>Bước 6 — Cập nhật:</strong> build image mới, dùng đúng <code>-f docker-compose.cloudflare.yml</code> để recreate. Giữ APP_SECRET, volume và token. <code>cloudflared:latest</code> là ví dụ dễ bắt đầu; cho production nên khóa phiên bản/digest đã kiểm tra và cập nhật có chủ đích.</p>
+<p>Trong Portainer: dán file YAML này vào Web editor, nhập thêm TUNNEL_TOKEN và các biến phần 3, deploy sau khi image local đã có trên đúng host. Không cần chạy lệnh Compose nếu Portainer đang quản lý stack đó.</p>
+<p>Nguồn: <a href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/create-remote-tunnel/">tạo tunnel bằng dashboard</a>, <a href="https://developers.cloudflare.com/tunnel/concepts/routing/">routing tunnel</a>, <a href="https://developers.cloudflare.com/tunnel/guides/kubernetes/">TUNNEL_TOKEN</a>. Các bước trên là cấu hình đề xuất cho repo, chưa triển khai lên tài khoản Cloudflare thật.</p>
+<h3>7.3 Cloudflare trước VPS hoặc cPanel đã có HTTPS</h3>
+<p>Nếu không dùng Tunnel, cài thành công ở phần 2/4 trước. Tạo DNS record cho subdomain webmail trỏ về origin, bật proxy cho hostname webmail, chọn <strong>Full (strict)</strong> và đảm bảo chứng chỉ origin còn hạn/đúng hostname. Không dùng Flexible cho ứng dụng đăng nhập. Đây vẫn là chạy trên VPS/cPanel; Cloudflare làm DNS/proxy, không host process Node.</p>
+<p>Không áp dụng Cache Everything lên Webmail. Nếu đã có cache rule rộng, loại trừ hostname webmail hoặc ít nhất /api/<em>, HTML chính, /sw.js và manifest khỏi ép cache; để /assets/</em> theo header cache của ứng dụng. Có thể chọn bypass cache cho toàn hostname lúc thiết lập. Kiểm tra giới hạn upload/timeout của gói trước khi tăng kích thước đính kèm. Nếu bật Access, người dùng có thêm một lớp đăng nhập; nghiệm thu cả các request API/sự kiện sau Access.</p>
+<p>Hostname SMTP/IMAP của Stalwart thông thường cần <strong>DNS only</strong>; proxy HTTP của Cloudflare không tự chuyển SMTP/IMAP. Không đổi hostname máy thư sang orange cloud chỉ vì webmail dùng proxy. Xem <a href="https://developers.cloudflare.com/dns/proxy-status/">DNS proxy status</a>, <a href="https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/full-strict/">Full (strict)</a>, <a href="https://developers.cloudflare.com/cache/how-to/cache-rules/settings/">Cache Rules</a>.</p>
+<h3>7.4 Muốn Webmail chạy trực tiếp trên Cloudflare Containers</h3>
+<p><strong>Có thể về mặt nền tảng, nhưng bản repo hiện tại chưa có triển khai hoàn chỉnh.</strong> Cloudflare Containers dùng gói Workers Paid, nhận image Linux/amd64 và được truy cập qua Worker/Durable Object. Không phải dán docker-compose.yml vào dashboard như Portainer. Kiểm tra <a href="https://developers.cloudflare.com/containers/pricing/">giá hiện hành</a> trước khi tạo môi trường.</p>
+<p>Để làm một bản riêng trên Containers, cần:</p>
+<ol>
+<li>Tạo project Worker/Durable Object và cấu hình Wrangler theo <a href="https://developers.cloudflare.com/containers/get-started/">Get started</a>; dùng Dockerfile của repo và kiến trúc linux/amd64.</li>
+<li>Truyền STALWART_URL, APP_SECRET bằng secret/env vào container; đặt PORT=8080, STATIC_DIR=/app/web/dist, TRUST_PROXY=1 và SECURE_COOKIES=1. Worker chuyển tiếp path/header/body và response stream đúng, không cache API.</li>
+<li>Bảo đảm các request của cùng phiên đi tới đúng instance. Không chia ngẫu nhiên mỗi request sang một container vì phiên hiện giữ trong bộ nhớ/file.</li>
+<li>Chọn cách lưu phiên: với SESSION_FILE để trống, container restart/sleep sẽ làm người dùng đăng nhập lại. Muốn giữ phiên cần thêm lưu trữ bền vững và thiết kế đồng bộ; đĩa container mặc định tạm thời, volume Compose không tự chuyển thành ổ bền vững trên Cloudflare. Snapshot không tự thay thế cập nhật file phiên liên tục.</li>
+<li>Kiểm tra cold start, sleep, deploy/rollback, file đính kèm, stream sự kiện, rate limit và IP người dùng trước production. Không chỉ kiểm tra trang login hiển thị được.</li>
+</ol>
+<p>Đây là danh sách công việc cần triển khai, <strong>không phải bộ lệnh đã kiểm thử sẵn</strong>. Hướng Tunnel ở 7.2 ít thay đổi mã nhất cho phiên bản hiện tại. Nguồn: <a href="https://developers.cloudflare.com/containers/">Containers overview</a>, <a href="https://developers.cloudflare.com/containers/concepts/architecture/">vòng đời và đĩa tạm</a>.</p>
+<h2 id="sao-luu">8. Sao lưu, cập nhật tài liệu và phạm vi kiểm thử</h2>
+<h3>8.1 Ví dụ sao lưu volume Docker</h3>
+<p>Thực hiện trong thư mục Compose của bản đang chạy. Nếu dùng Tunnel, thay mọi <code>docker compose</code> dưới đây bằng <code>docker compose -f docker-compose.cloudflare.yml</code>. Dừng Webmail trong lúc sao lưu để file phiên không thay đổi:</p>
+<pre><code class="language-sh">mkdir -p backups
+chmod 700 backups
+docker compose stop webmail
+container_id=$(docker compose ps -aq webmail)
+volume_name=$(docker inspect &quot;$container_id&quot; --format &#39;{{range .Mounts}}{{if eq .Destination &quot;/data&quot;}}{{.Name}}{{end}}{{end}}&#39;)
+test -n &quot;$volume_name&quot; || { echo &quot;Khong tim thay named volume /data&quot;; exit 1; }
+docker run --rm -v &quot;$volume_name&quot;:/data:ro -v &quot;$PWD/backups&quot;:/backup alpine:3.22 \
+  sh -c &#39;tar -czf /backup/sessions-$(date -u +%Y%m%dT%H%M%SZ).tar.gz -C /data .&#39;
+docker compose start webmail
+</code></pre>
+<p>Ghi lại tên volume, file backup và APP_SECRET tương ứng. Nếu bước backup lỗi, chưa có bản sao hợp lệ; kiểm tra trước khi tiếp tục cập nhật. File phiên có thông tin xác thực được mã hóa; không đưa backup hoặc secret lên thư mục web công khai.</p>
+<p>Khi khôi phục, dừng Webmail, sao lưu trạng thái hiện tại trước, xác nhận <strong>đúng volume đích</strong>. Thay BACKUP_FILE bằng tên file có thật trong backups rồi giải nén vào volume đã xác định:</p>
+<pre><code class="language-sh">docker run --rm -v &quot;$volume_name&quot;:/data -v &quot;$PWD/backups&quot;:/backup:ro alpine:3.22 \
+  tar -xzf /backup/BACKUP_FILE.tar.gz -C /data
+docker compose start webmail
+</code></pre>
+<p>Lệnh khôi phục ghi đè file trùng tên trong volume. Giữ secret gốc và kiểm tra quyền ghi của user node. Với cPanel, dừng/restart theo panel và sao chép thư mục <code>data</code> bằng tài khoản hosting; không áp dụng lệnh Docker trên shared hosting.</p>
+<h3>8.2 Những gì cần giữ khi cập nhật</h3>
+<ul>
+<li>Lưu bản <code>.env</code>/biến Portainer/cPanel, APP_SECRET và tag/commit ở nơi riêng. Sao lưu file phiên khi Webmail đã dừng; dùng Volumes trong Portainer hoặc công cụ backup Docker phù hợp để xuất đúng volume.</li>
+<li>Khi restore, chạy một instance Webmail duy nhất với file phiên và secret tương ứng. Thư, danh bạ/lịch/tệp được lưu theo khả năng Stalwart, nên phải có quy trình backup máy thư riêng.</li>
+<li>File hướng dẫn HTML được sinh từ <code>docs/CAI-DAT.md</code> bằng <code>node scripts/build-guide.mjs</code>, rồi đi vào web/dist khi build. Sửa Markdown gốc, sinh lại HTML; không chỉ sửa bản web/dist vì lần build sau sẽ ghi đè.</li>
+<li>Trang <code>/huong-dan.html</code> truy cập trực tiếp; không nằm trên login hoặc menu tài khoản. Khi dùng BASE_PATH, thêm tiền tố vào URL trang này.</li>
+<li>Đã kiểm tra build/giao diện cục bộ. Docker, Portainer, cPanel và Cloudflare thật cần nghiệm thu trên môi trường của bạn; tài liệu không thay thế kết quả triển khai thực tế.</li>
+</ul>
+</article></main><footer>Hướng dẫn tiếng Việt · Đối chiếu ngày 02/10/2026 · Kiểm tra môi trường thật trước khi đưa vào sử dụng.</footer></body></html>

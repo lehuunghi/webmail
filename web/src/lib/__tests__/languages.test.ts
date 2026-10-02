@@ -9,12 +9,12 @@ import { DEFAULT_SETTINGS, acceptRemote } from "@/store/settings";
  * component tree. So the resolution is deliberately narrow.
  */
 describe("resolveUiLanguage", () => {
-  it("is English when nothing has been chosen", () => {
+  it("is Vietnamese when nothing has been chosen", () => {
     // The absent case covers both a new account and every settings file
     // written before this setting existed.
-    expect(resolveUiLanguage(undefined)).toBe("en");
-    expect(resolveUiLanguage(null)).toBe("en");
-    expect(resolveUiLanguage("")).toBe("en");
+    expect(resolveUiLanguage(undefined)).toBe("vi");
+    expect(resolveUiLanguage(null)).toBe("vi");
+    expect(resolveUiLanguage("")).toBe("vi");
     expect(DEFAULT_SETTINGS.uiLanguage).toBe(DEFAULT_UI_LANGUAGE);
   });
 
@@ -25,8 +25,8 @@ describe("resolveUiLanguage", () => {
     // Derived rather than named, so shipping another language does not turn
     // this into a failing test that is really just out of date.
     const unshipped = ["cy", "is", "mt", "eu"].find((tag) => !UI_LANGUAGES.some((l) => l.tag === tag))!;
-    expect(resolveUiLanguage(unshipped)).toBe("en");
-    expect(resolveUiLanguage("xx-XX")).toBe("en");
+    expect(resolveUiLanguage(unshipped)).toBe("vi");
+    expect(resolveUiLanguage("xx-XX")).toBe("vi");
   });
 
   it("carries the Beta flag until a person has signed the language off", () => {

@@ -1032,7 +1032,7 @@ export const catalog: Catalog = {
 
     // ── Attachments, dates, search prose ───────────────────────────────
     "Large attachments may be rejected by some servers": "大きな添付ファイルは、サーバーによっては拒否されることがあります",
-    "Images are stored in your Files (folder “ihasmail”) and embedded when you send.": "画像は「ファイル」内（フォルダー「ihasmail」）に保存され、送信時にメールへ埋め込まれます。",
+    "Images are stored in your Files and embedded when you send.": "画像は「ファイル」内（フォルダー「Webmail」）に保存され、送信時にメールへ埋め込まれます。",
     "After": "以降",
     "Before": "以前",
     "Choose a date": "日付を選択",
@@ -1056,8 +1056,8 @@ export const catalog: Catalog = {
     "Advanced: manage raw Sieve scripts. Only one script can be active at a time.": "詳細設定: Sieve スクリプトを直接管理します。有効にできるスクリプトは同時に 1 つだけです。",
     "Only part of your filter script arrived.": "フィルタースクリプトの一部しか取得できませんでした。",
     "Your active script “{name}” was written by hand.": "有効なスクリプト「{name}」は手書きで作成されたものです。",
-    "Another script (“{name}”) is active. Saving rules here will activate the “ihasmail” script instead.": "別のスクリプト（「{name}」）が有効です。ここでルールを保存すると、代わりに「ihasmail」スクリプトが有効になります。",
-    "“{name}” will be deactivated (not deleted) and a new “ihasmail” script will take over.": "「{name}」は無効化され（削除はされません）、新しい「ihasmail」スクリプトが引き継ぎます。",
+    "Another script (“{name}”) is active. Saving rules here will activate the app’s rules script instead.": "別のスクリプト（「{name}」）が有効です。ここでルールを保存すると、代わりに「Webmail」スクリプトが有効になります。",
+    "“{name}” will be deactivated (not deleted) and a new rules script will take over.": "「{name}」は無効化され（削除はされません）、新しい「Webmail」スクリプトが引き継ぎます。",
     "Sieve filtering is not available for this account.": "このアカウントでは Sieve フィルターを利用できません。",
     "Sieve filtering is not enabled for this account.": "このアカウントでは Sieve フィルターが有効になっていません。",
     "Vacation responses are not available for this account.": "このアカウントでは不在時の自動返信を利用できません。",
@@ -1468,7 +1468,7 @@ export const catalog: Catalog = {
     "Go to Settings": "設定へ移動",
     "Go to Starred": "スター付きへ移動",
     "Import iCAL file…": "iCAL ファイルをインポート…",
-    "Labels are IMAP keywords stored on your messages, so every other client sees them. Names, colors and nesting are ihasmail’s own and follow your account. Nesting is display only — it rewrites nothing in the mailbox.": "ラベルはメールに保存される IMAP キーワードなので、ほかのクライアントからも見えます。名前、色、入れ子は ihasmail 独自のもので、アカウントに従います。入れ子は表示上のものにすぎず、メールボックスの中身は書き換えません。",
+    "Labels are IMAP keywords stored on your messages, so every other client sees them. Names, colors and nesting are ihasmail’s own and follow your account. Nesting is display only — it rewrites nothing in the mailbox.": "ラベルはメールに保存される IMAP キーワードなので、ほかのクライアントからも見えます。名前、色、入れ子は Webmail 独自のもので、アカウントに従います。入れ子は表示上のものにすぎず、メールボックスの中身は書き換えません。",
     "Largest first": "サイズの大きい順",
     "Later": "これより後",
     "Light or dark": "ライトまたはダーク",

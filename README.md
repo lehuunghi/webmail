@@ -3,15 +3,21 @@
 Bản tùy chỉnh của [Coffey-Labs/ihasmail](https://github.com/Coffey-Labs/ihasmail),
 duy trì mã nguồn tại [lehuunghi/webmail](https://github.com/lehuunghi/webmail).
 
-- **Tiếng Việt:** chọn **Tiếng Việt (Beta)** ngay ở màn hình đăng nhập, hoặc trong
+- **Tiếng Việt:** là ngôn ngữ mặc định ngay ở màn hình đăng nhập; có thể đổi trong
   **Settings → Appearance → Interface language**. Bản dịch gồm thư, lịch, danh bạ,
   tệp, cài đặt và quyền quản trị. Beta cho đến khi được người bản ngữ duyệt.
-- **Giao diện Webmail:** nền sáng, thanh tìm kiếm bo tròn, nút Soạn thư xanh nhạt,
-  danh sách thư toàn chiều rộng, hỗ trợ cả chế độ tối và màn hình nhỏ.
+- **Giao diện Webmail:** nền sáng, các khung và nút góc vuông, nút Soạn thư xanh nhạt,
+  danh sách thư toàn chiều rộng, hỗ trợ cả chế độ tối và màn hình nhỏ. Thanh Thư / Lịch / Danh bạ / Tệp gọn hơn, chữ 12px và icon 22px rõ nét.
 - Người dùng mới mặc định dùng chủ đề **Webmail**, chế độ sáng và ẩn ngăn đọc.
   Tài khoản đã lưu cài đặt vẫn giữ lựa chọn cũ; vào **Settings → Appearance**
   chọn **Webmail / Light**, và **General → Reading pane → Off** nếu muốn bố cục mới.
-- Ngôn ngữ tiếng Anh vẫn là mặc định và dự phòng; có thể chuyển ngôn ngữ bất cứ lúc nào.
+- Ngôn ngữ tiếng Anh là dự phòng khi thiếu bản dịch; có thể chuyển ngôn ngữ bất cứ lúc nào.
+
+## Hướng dẫn cài đặt bản riêng
+
+Đọc [hướng dẫn tiếng Việt](docs/CAI-DAT.md) để cài bằng Docker, Portainer hoặc Node.js trên cPanel. Bản hướng dẫn trên trình duyệt nằm tại `/huong-dan.html`. Image `lehuunghi/webmail:local` được build từ chính repo này, không phải image có sẵn trên Docker Hub.
+
+Có hướng dẫn Cloudflare Tunnel và stack `docker-compose.cloudflare.yml` để chạy Webmail trên máy Docker riêng qua tên miền Cloudflare. Pages/Workers chưa chạy nguyên repo; Containers cần tích hợp Worker/Durable Object và xử lý lưu phiên trước khi triển khai trực tiếp.
 
 ## Chạy thử
 
@@ -121,7 +127,7 @@ against 0.16.22; what changed in each release is in
 
 ```bash
 cp .env.example .env
-# edit: STALWART_URL=https://mail.example.com  and  APP_SECRET=$(openssl rand -base64 48)
+# edit: STALWART_URL=https://jmail.vn  and  APP_SECRET=$(openssl rand -base64 48)
 docker compose up --build -d
 # → http://localhost:8080 — put a reverse proxy in front for TLS
 ```

@@ -1,0 +1,40 @@
+# Build lehuunghi/webmail:local on this host before starting this stack.
+# In Cloudflare, route webmail.example.com to http://webmail:8080.
+services:
+  webmail:
+    image: ${WEBMAIL_IMAGE:-lehuunghi/webmail:local}
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      STALWART_URL: ${STALWART_URL:-https://jmail.vn}
+      APP_SECRET: ${APP_SECRET:?set APP_SECRET}
+      APP_NAME: ${APP_NAME:-Webmail}
+      APP_LOGO_URL: ${APP_LOGO_URL:-}
+      SOURCE_URL: ${SOURCE_URL:-https://github.com/lehuunghi/webmail}
+      TRUST_PROXY: "1"
+      SECURE_COOKIES: "1"
+      IMAGE_PROXY: "1"
+    volumes:
+      - webmail-data:/data
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?set the remotely managed tunnel token}
+    depends_on:
+      webmail:
+        condition: service_healthy
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+volumes:
+  webmail-data:

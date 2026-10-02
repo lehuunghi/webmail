@@ -1031,7 +1031,7 @@ export const catalog: Catalog = {
 
     // ── Attachments, dates, search prose ───────────────────────────────
     "Large attachments may be rejected by some servers": "部分服务器可能拒收过大的附件",
-    "Images are stored in your Files (folder “ihasmail”) and embedded when you send.": "图片保存在您的「文件」中（文件夹「ihasmail」），并在发送时嵌入邮件。",
+    "Images are stored in your Files and embedded when you send.": "图片保存在您的「文件」中（文件夹「Webmail」），并在发送时嵌入邮件。",
     "After": "晚于",
     "Before": "早于",
     "Choose a date": "选择日期",
@@ -1055,8 +1055,8 @@ export const catalog: Catalog = {
     "Advanced: manage raw Sieve scripts. Only one script can be active at a time.": "高级：管理原始 Sieve 脚本。同一时间只能启用一个脚本。",
     "Only part of your filter script arrived.": "您的过滤脚本只收到了一部分。",
     "Your active script “{name}” was written by hand.": "您启用的脚本「{name}」是手动编写的。",
-    "Another script (“{name}”) is active. Saving rules here will activate the “ihasmail” script instead.": "另一个脚本（「{name}」）正在启用中。在此保存规则将改为启用「ihasmail」脚本。",
-    "“{name}” will be deactivated (not deleted) and a new “ihasmail” script will take over.": "「{name}」将被停用（不会删除），改由新的「ihasmail」脚本接管。",
+    "Another script (“{name}”) is active. Saving rules here will activate the app’s rules script instead.": "另一个脚本（「{name}」）正在启用中。在此保存规则将改为启用「Webmail」脚本。",
+    "“{name}” will be deactivated (not deleted) and a new rules script will take over.": "「{name}」将被停用（不会删除），改由新的「Webmail」脚本接管。",
     "Sieve filtering is not available for this account.": "此账户不支持 Sieve 过滤。",
     "Sieve filtering is not enabled for this account.": "此账户未启用 Sieve 过滤。",
     "Vacation responses are not available for this account.": "此账户不支持外出自动回复。",
@@ -1467,7 +1467,7 @@ export const catalog: Catalog = {
     "Go to Settings": "转到设置",
     "Go to Starred": "转到已标星",
     "Import iCAL file…": "导入 iCAL 文件…",
-    "Labels are IMAP keywords stored on your messages, so every other client sees them. Names, colors and nesting are ihasmail’s own and follow your account. Nesting is display only — it rewrites nothing in the mailbox.": "标签是保存在邮件上的 IMAP 关键字，因此其他客户端也能看到。名称、颜色和层级是 ihasmail 自有的，随您的账户一同保存。层级仅影响显示，不会改写邮箱中的任何内容。",
+    "Labels are IMAP keywords stored on your messages, so every other client sees them. Names, colors and nesting are ihasmail’s own and follow your account. Nesting is display only — it rewrites nothing in the mailbox.": "标签是保存在邮件上的 IMAP 关键字，因此其他客户端也能看到。名称、颜色和层级是 Webmail 自有的，随您的账户一同保存。层级仅影响显示，不会改写邮箱中的任何内容。",
     "Largest first": "从大到小",
     "Later": "更晚",
     "Light or dark": "浅色或深色",

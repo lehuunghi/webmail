@@ -463,7 +463,7 @@ self.addEventListener("push", (event) => {
     const windows = await self.clients.matchAll({ type: "window" });
     if (windows.some((w) => w.focused && w.visibilityState === "visible")) return;
     const facts = await readFacts();
-    const strings = facts?.strings ?? { newMail: "New mail", newMessage: "New message", noSubject: "(no subject)" };
+    const strings = facts?.strings ?? { newMail: "Thư mới", newMessage: "Thư mới", noSubject: "(không có tiêu đề)" };
     /*
      * Mark the app icon, without claiming a number.
      *
@@ -535,8 +535,8 @@ async function runAction(action, data) {
     if (action === "archive" && !archiveId) throw new Error("no archive mailbox");
     await jmap([["Email/set", { accountId, update: { [id]: patch } }, "0"]]);
   } catch {
-    await self.registration.showNotification(data.title || "ihasmail", {
-      body: data.failed || "Could not do that — open ihasmail and try again",
+    await self.registration.showNotification(data.title || "Webmail", {
+      body: data.failed || "Không thể thực hiện — mở Webmail và thử lại",
       icon: `${BASE}/img/icon-192.png`,
       badge: `${BASE}/img/favicon-64.png`,
       tag: `ihasmail-failed-${id}`,

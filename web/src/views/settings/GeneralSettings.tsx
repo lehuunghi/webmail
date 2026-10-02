@@ -239,7 +239,7 @@ export function GeneralSettings() {
 
       <h2>{t("Backup")}</h2>
       <div className="row wrap">
-        <button className="btn" onClick={() => downloadFile(exportJson(), "application/json", "ihasmail-settings.json")}>{t("Export settings")}</button>
+        <button className="btn" onClick={() => downloadFile(exportJson(), "application/json", "webmail-settings.json")}>{t("Export settings")}</button>
         <label className="btn">
           {t("Import settings")}
           <input type="file" accept="application/json" hidden onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; const ok = importJson(await f.text()); toast[ok ? "success" : "error"](ok ? t("Settings imported") : t("Invalid settings file")); e.target.value = ""; }} />
@@ -289,7 +289,7 @@ function MailHandlerSettings() {
         {tNode("Open {scheme} links — in web pages, documents and other apps — in {app} instead of a desktop mail client. Your browser will ask you to confirm, and you can change it later in its own settings (Chrome: Settings › Privacy and security › Site settings › Protocol handlers; Firefox: Settings › General › Applications).", { scheme: <code>mailto:</code> }, { app: appName })}
       </p>
       <div className="row wrap">
-        <button className="btn btn-primary" onClick={ask}>{requested ? "Ask again" : "Make ihasmail the default mail app"}</button>
+        <button className="btn btn-primary" onClick={ask}>{requested ? t("Ask again") : t("Make {app} the default mail app", { app: appName })}</button>
         {requested && canUnregisterMailtoHandler() && <button className="btn btn-ghost" onClick={remove}>{t("Remove")}</button>}
       </div>
       {requested && <p className="hint mt-8">{t("Requested in this browser. Whether it took effect is up to the browser — check its settings if mail links still open elsewhere.")}</p>}
