@@ -1257,6 +1257,9 @@ a.menu-item:hover { color: var(--fg); }
 .searchbar input::placeholder { color: var(--fg-faint); }
 .search-panel { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-2); padding: 16px; z-index: 60; animation: pop .12s var(--ease); }
 .search-panel .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+.search-panel-footer { display: flex; justify-content: space-between; gap: 16px; margin-top: 16px; }
+.search-panel-options { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.search-panel-actions { margin-left: auto; }
 .search-suggest { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-2); padding: 6px; z-index: 60; }
 .topbar-actions { display: flex; align-items: center; gap: 4px; }
 /* Live-updates indicator. Three states, and a raised bead rather than a flat
