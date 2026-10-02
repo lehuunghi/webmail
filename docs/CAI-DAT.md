@@ -122,10 +122,10 @@ TRUST_PROXY=1
 IMAGE_PROXY=1
 ```
 
-Ứng dụng không tự nạp `.env` khi chạy `node` thông thường. Nhập biến vào cPanel là bước bắt buộc. Để Passenger quản lý socket/cổng, không ép PORT nếu nhà cung cấp không yêu cầu. APP_SECRET phải đủ mạnh; server sẽ từ chối khởi động production khi thiếu.
+Server có thể nạp `.env` từ thư mục ứng dụng; biến môi trường thật được ưu tiên. Trên cPanel, nên nhập biến vào phần Environment variables để Passenger nhận đúng cấu hình. Để Passenger quản lý socket/cổng, không ép PORT nếu nhà cung cấp không yêu cầu. APP_SECRET phải đủ mạnh; server sẽ từ chối khởi động production khi thiếu.
 
 5. Start/Restart app. Nếu có môi trường ảo CloudLinux, chạy lệnh kích hoạt môi trường mà cPanel hiển thị trước khi chạy npm.
-6. Mở `https://webmail.example.com/api/health`, rồi đăng nhập bằng tài khoản Stalwart. Trang đăng nhập phải có “Tiếng Việt”, “Đăng nhập” và liên kết hướng dẫn. Thử gửi/nhận một thư bằng tài khoản thật.
+6. Mở `https://webmail.example.com/api/health`, rồi đăng nhập bằng tài khoản Stalwart. Trang đăng nhập phải có “Tiếng Việt” và “Đăng nhập”. Thử gửi/nhận một thư bằng tài khoản thật.
 
 ### 4.3 Cập nhật cPanel
 
@@ -152,3 +152,9 @@ Kiểm thử demo dùng `npm run mock` và STALWART_URL `http://127.0.0.1:8788`,
 - Docker Compose: https://docs.docker.com/compose/
 
 Giữ LICENSE và NOTICE trong bản phân phối. Liên kết “Mã nguồn AGPL-3.0” trong ứng dụng trỏ đến mã nguồn bản của bạn.
+
+## 6. Đổi logo riêng
+
+Đặt trong .env: APP_LOGO_URL=https://cdn.example.com/logo.png. Có thể dùng đường dẫn nội bộ như /img/logo-rieng.svg (file đặt trong web/public/img rồi build lại). Để trống sẽ dùng logo Webmail mặc định. Logo áp dụng cho login, thanh đầu trang và vùng đọc thư; ảnh lỗi sẽ tự quay về logo mặc định. Nên dùng PNG, WebP hoặc SVG, nền trong suốt và URL HTTPS trỏ trực tiếp tới ảnh.
+
+Docker Compose tự truyền APP_LOGO_URL từ .env; Portainer nhập biến này trong Environment variables của stack; cPanel nhập vào Environment variables của ứng dụng. Sau khi đổi URL, restart/recreate ứng dụng và tải lại trang. Đây là logo chung của bản cài đặt, không phải tùy chọn riêng của từng tài khoản. Favicon và icon cài ứng dụng vẫn dùng bộ icon mặc định.

@@ -91,10 +91,10 @@ SESSION_FILE=/home/CPANEL_USER/webmail/data/sessions.json
 TRUST_PROXY=1
 IMAGE_PROXY=1
 </code></pre>
-<p>Ứng dụng không tự nạp <code>.env</code> khi chạy <code>node</code> thông thường. Nhập biến vào cPanel là bước bắt buộc. Để Passenger quản lý socket/cổng, không ép PORT nếu nhà cung cấp không yêu cầu. APP_SECRET phải đủ mạnh; server sẽ từ chối khởi động production khi thiếu.</p>
+<p>Server có thể nạp <code>.env</code> từ thư mục ứng dụng; biến môi trường thật được ưu tiên. Trên cPanel, nên nhập biến vào phần Environment variables để Passenger nhận đúng cấu hình. Để Passenger quản lý socket/cổng, không ép PORT nếu nhà cung cấp không yêu cầu. APP_SECRET phải đủ mạnh; server sẽ từ chối khởi động production khi thiếu.</p>
 <ol start="5">
 <li>Start/Restart app. Nếu có môi trường ảo CloudLinux, chạy lệnh kích hoạt môi trường mà cPanel hiển thị trước khi chạy npm.</li>
-<li>Mở <code>https://webmail.example.com/api/health</code>, rồi đăng nhập bằng tài khoản Stalwart. Trang đăng nhập phải có “Tiếng Việt”, “Đăng nhập” và liên kết hướng dẫn. Thử gửi/nhận một thư bằng tài khoản thật.</li>
+<li>Mở <code>https://webmail.example.com/api/health</code>, rồi đăng nhập bằng tài khoản Stalwart. Trang đăng nhập phải có “Tiếng Việt” và “Đăng nhập”. Thử gửi/nhận một thư bằng tài khoản thật.</li>
 </ol>
 <h3>4.3 Cập nhật cPanel</h3>
 <p>Sao lưu mã nguồn phiên bản cũ, <code>data</code> và ghi lại các biến. Chạy <code>git pull --ff-only</code>, <code>npm ci</code>, <code>npm run build</code>, sau đó Restart trong cPanel. Với Passenger có thể chạy <code>mkdir -p tmp &amp;&amp; touch tmp/restart.txt</code>. Kiểm tra health, đăng nhập, tài liệu và log lỗi. Không đưa APP_SECRET vào thư mục web công khai.</p>
@@ -140,4 +140,7 @@ IMAGE_PROXY=1
 <li>Docker Compose: <a href="https://docs.docker.com/compose/">https://docs.docker.com/compose/</a></li>
 </ul>
 <p>Giữ LICENSE và NOTICE trong bản phân phối. Liên kết “Mã nguồn AGPL-3.0” trong ứng dụng trỏ đến mã nguồn bản của bạn.</p>
+<h2>6. Đổi logo riêng</h2>
+<p>Đặt trong .env: APP_LOGO_URL=<a href="https://cdn.example.com/logo.png">https://cdn.example.com/logo.png</a>. Có thể dùng đường dẫn nội bộ như /img/logo-rieng.svg (file đặt trong web/public/img rồi build lại). Để trống sẽ dùng logo Webmail mặc định. Logo áp dụng cho login, thanh đầu trang và vùng đọc thư; ảnh lỗi sẽ tự quay về logo mặc định. Nên dùng PNG, WebP hoặc SVG, nền trong suốt và URL HTTPS trỏ trực tiếp tới ảnh.</p>
+<p>Docker Compose tự truyền APP_LOGO_URL từ .env; Portainer nhập biến này trong Environment variables của stack; cPanel nhập vào Environment variables của ứng dụng. Sau khi đổi URL, restart/recreate ứng dụng và tải lại trang. Đây là logo chung của bản cài đặt, không phải tùy chọn riêng của từng tài khoản. Favicon và icon cài ứng dụng vẫn dùng bộ icon mặc định.</p>
 </main></body></html>

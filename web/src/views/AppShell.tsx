@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from "rea
 import { Link, useLocation } from "wouter";
 import { Calendar, ChevronsUpDown, FolderOpen, HelpCircle, LogOut, Mail, Menu as MenuIcon, Moon, PenSquare, Plus, RefreshCw, Settings, ShieldCheck, Sun, Upload, Users, X } from "lucide-react";
 import { useSession } from "@/store/session";
-import { withBase } from "@/lib/basePath";
+import { BrandLogo } from "@/ui/BrandLogo";
 import { DEFAULT_APP_NAME } from "@/lib/brand";
 import { useEffectiveTheme, useSettings } from "@/store/settings";
 import { toggleTarget } from "@/lib/palette";
@@ -147,7 +147,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <MenuIcon size={22} />
         </button>
         <Link href="/mail" className="brand">
-          <img src={withBase("/img/webmail.svg")} alt="" />
+          <BrandLogo />
           {/* A product name, not a word: translated it is a different product.
               Read from the session rather than written here, so a deployment
               that set APP_NAME is called what it calls itself -- the document
@@ -240,6 +240,14 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <X size={22} />
               </button>
             </div>
+          )}
+          {isMobile && (
+            <nav className="mobile-workspace-nav" aria-label={t("Sections")} onClick={() => setDrawer(false)}>
+              <ModuleLink href="/mail" icon={<Mail size={20} />} label={t("Mail")} active={section === "mail" || section === "search"} />
+              <ModuleLink href="/calendar" icon={<Calendar size={20} />} label={t("Calendar")} active={section === "calendar"} />
+              <ModuleLink href="/contacts" icon={<Users size={20} />} label={t("Contacts")} active={section === "contacts"} />
+              <ModuleLink href="/files" icon={<FolderOpen size={20} />} label={t("Files")} active={section === "files"} />
+            </nav>
           )}
           {/* Whatever this pane is for. Files offered Compose, which wrote mail
               from the file manager and was the one thing nobody wanted there. */}

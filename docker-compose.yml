@@ -28,6 +28,7 @@ services:
       STALWART_URL: ${STALWART_URL:?set STALWART_URL in .env}
       APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (openssl rand -base64 48)}
       APP_NAME: ${APP_NAME:-Webmail}
+      APP_LOGO_URL: ${APP_LOGO_URL:-}
       BASE_PATH: ${BASE_PATH:-}
       SOURCE_URL: ${SOURCE_URL:-https://github.com/lehuunghi/webmail}
       TRUST_PROXY: "1"

@@ -17,6 +17,7 @@ services:
       STALWART_URL: ${STALWART_URL:?set STALWART_URL}
       APP_SECRET: ${APP_SECRET:?set APP_SECRET}
       APP_NAME: Webmail
+      APP_LOGO_URL: ${APP_LOGO_URL:-}
       SOURCE_URL: https://github.com/lehuunghi/webmail
       TRUST_PROXY: "1"
       IMAGE_PROXY: "1"

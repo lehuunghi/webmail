@@ -7,18 +7,21 @@ import { DEFAULT_APP_NAME } from "@/lib/brand";
 import { t } from "@/lib/i18n";
 import { UI_LANGUAGES } from "@/lib/languages";
 import { useSettings } from "@/store/settings";
+import { BrandLogo } from "@/ui/BrandLogo";
 
 export function LoginPage() {
   const uiLanguage = useSettings((s) => s.settings.uiLanguage);
   const updateSettings = useSettings((s) => s.update);
   const login = useSession((s) => s.login);
   const [appName, setAppName] = useState(DEFAULT_APP_NAME);
+  const [logoUrl, setLogoUrl] = useState("");
   useEffect(() => {
     let live = true;
     fetch(withBase("/api/config"))
       .then((r) => (r.ok ? r.json() : null))
       .then((c) => {
         if (!live || !c) return;
+        if (typeof c.logoUrl === "string") setLogoUrl(c.logoUrl);
         if (typeof c.appName === "string" && c.appName.trim()) setAppName(c.appName.trim());
       })
       .catch(() => { /* the default stands */ });
@@ -58,7 +61,7 @@ export function LoginPage() {
       <div className="login-container">
         <form className="login-card" onSubmit={submit}>
           <div className="login-intro">
-            <div className="login-brand"><img src={withBase("/img/webmail.svg")} alt="" width={40} height={40} /><span className="notranslate" translate="no">{appName}</span></div>
+            <div className="login-brand"><BrandLogo url={logoUrl} size={32} /><span className="notranslate" translate="no">{appName}</span></div>
             <h1>{t("Sign in")}</h1>
             <p>{t("Use your account to access your workspace.")}</p>
           </div>
