@@ -112,6 +112,13 @@
 }
 
 /* Compact workspace rail and square surfaces requested for this deployment. */
+:root[data-palette="webmail"] .mail-navigation .nav-item { box-sizing: border-box; width: calc(100% - 8px); gap: 12px; text-align: left; font-family: inherit; }
+:root[data-palette="webmail"] .mail-navigation .folder-row { position: relative; padding-left: calc(12px + var(--folder-indent, 0px)); }
+:root[data-palette="webmail"] .mail-navigation .folder-row > .nav-twisty { position: absolute; left: var(--folder-indent, 0px); width: 12px; margin: 0; }
+:root[data-palette="webmail"] .mail-navigation.folder-drill .folder-row { padding-left: 12px; }
+:root[data-palette="webmail"] .mail-navigation .folder-icon { width: 20px; flex: 0 0 20px; justify-content: center; }
+:root[data-palette="webmail"] .mail-navigation .nav-label-color { width: 20px; height: 20px; flex: 0 0 20px; display: inline-flex; align-items: center; justify-content: center; background: transparent; }
+:root[data-palette="webmail"] .mail-navigation .nav-label-color::before { content: ""; display: block; width: 14px; height: 12px; background: var(--label-color); clip-path: polygon(0 0, 65% 0, 100% 50%, 65% 100%, 0 100%); }
 :root[data-palette="webmail"] .workspace-rail { gap: 2px; padding: 8px 4px; background: var(--bg-sunken); }
 :root[data-palette="webmail"] .workspace-rail .module-link { width: 56px; height: 52px; gap: 2px; padding: 4px 0; font-size: 12px; font-weight: 500; color: var(--fg); }
 :root[data-palette="webmail"] .workspace-rail .module-link svg { width: 22px; height: 22px; padding: 3px 10px; border-radius: 0; stroke-width: 2.2; }
