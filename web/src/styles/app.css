@@ -2496,3 +2496,33 @@ button.dp-open:disabled { cursor: default; opacity: .5; }
   .mobile-workspace-nav { display: flex; gap: 4px; padding: 0 4px 12px; border-bottom: 1px solid var(--border); margin-bottom: 12px; flex-shrink: 0; }
   .mobile-workspace-nav .module-link { flex: 1; min-width: 0; height: 60px; margin: 0; padding: 8px 2px; gap: 6px; font-size: 11px; line-height: 16px; border-radius: 16px; }
 }
+
+@media (max-width: 768px) {
+  .reply-box .reply-prompt {
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 0;
+    border: 0;
+  }
+  .reply-box .reply-prompt > button {
+    min-width: 0;
+    min-height: 40px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    gap: 3px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .reply-box .reply-prompt > button:not(.icon-btn) svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .reply-box .reply-prompt > .spacer { display: none; }
+  .reply-box .reply-prompt > .icon-btn {
+    width: 24px;
+    flex: 0 0 24px;
+    margin-left: auto;
+  }
+}
