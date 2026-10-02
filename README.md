@@ -167,3 +167,7 @@ Copyright (C) 2026 Coffey Labs — AGPL-3.0-or-later. See [LICENSE](LICENSE).
 If you run a modified ihasmail, set `SOURCE_URL` to your own repository: the
 sign-in page and Settings › About both show it. See
 [Rebranding](https://docs.ihasmail.org/rebranding/).
+
+### INBUXA compatibility
+
+The Webmail fork supports registry capabilities `urn:stalwart:jmap` and `urn:inbuxa:jmap:registry`, selecting the capability advertised by the JMAP session for registry requests. Set `STALWART_URL=https://jmail.vn` in Webmail. For INBUXA, enable `INBUXA_HTTP_BASIC_AUTH=all` in the **INBUXA server environment**, then restart INBUXA; this variable does not belong in the Webmail container. See the Vietnamese installation guide for deployment details.

@@ -379,7 +379,7 @@ export function createApp(basePath = config.basePath): Hono<Env> {
           {
             error: "unsupported_server",
             message:
-              "Your credentials are fine, but this mail server is older than Stalwart 0.16, which ihasmail needs. Upgrade the server, or run the release tagged stalwart-0.15-support.",
+              "Máy chủ thư không công bố capability registry được hỗ trợ (urn:stalwart:jmap hoặc urn:inbuxa:jmap:registry). Kiểm tra cấu hình JMAP và phiên bản máy chủ.",
           },
           501,
         );

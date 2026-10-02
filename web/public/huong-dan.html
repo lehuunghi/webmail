@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hướng dẫn cài đặt · Webmail</title><link rel="stylesheet" href="huong-dan.css"></head>
 <body><header><a href="./">← Webmail</a><span>Hướng dẫn triển khai · lehuunghi</span></header><main><nav aria-label="Mục lục"><strong>Mục lục</strong><a href="#chuan-bi">1. Chuẩn bị</a><a href="#docker">2. Docker riêng</a><a href="#portainer">3. Portainer</a><a href="#cpanel">4. Hosting cPanel</a><a href="#kiem-tra">5. Kiểm tra & lỗi</a><a href="#logo">6. Đổi logo</a><a href="#cloudflare">7. Cloudflare</a><a href="#sao-luu">8. Sao lưu</a><a class="source-link" href="https://github.com/lehuunghi/webmail/tree/codex/vietnamese-default-deployment-guide">Xem mã nguồn ↗</a></nav><article><h1>Cài đặt Webmail của lehuunghi</h1>
-<p>Mã nguồn: <a href="https://github.com/lehuunghi/webmail">https://github.com/lehuunghi/webmail</a>. Giao diện mới mặc định là tiếng Việt; lựa chọn ngôn ngữ đã lưu của người dùng vẫn được giữ. Có thể đổi tên bằng <code>APP_NAME</code>. Đây là <strong>ứng dụng đọc thư JMAP</strong>, cần máy chủ <strong>Stalwart 0.16 trở lên</strong> đang hoạt động. Nó không tự cung cấp SMTP, IMAP hay tạo hộp thư. Tạo tài khoản, tên miền và DNS gửi/nhận thư trên Stalwart trước.</p>
+<p>Mã nguồn: <a href="https://github.com/lehuunghi/webmail">https://github.com/lehuunghi/webmail</a>. Giao diện mới mặc định là tiếng Việt; lựa chọn ngôn ngữ đã lưu của người dùng vẫn được giữ. Có thể đổi tên bằng <code>APP_NAME</code>. Đây là <strong>ứng dụng đọc thư JMAP</strong>, cần máy chủ <strong>INBUXA hoặc Stalwart có capability registry tương thích</strong> đang hoạt động. Nó không tự cung cấp SMTP, IMAP hay tạo hộp thư. Tạo tài khoản, tên miền và DNS gửi/nhận thư trên máy chủ thư trước.</p>
 <p>Hướng dẫn đối chiếu với mã nguồn và tài liệu nhà cung cấp ngày <strong>02/10/2026</strong>. Các địa chỉ <code>example.com</code>, CPANEL_USER và chuỗi bí mật trong ví dụ phải thay bằng thông tin thật. Các bước triển khai trên dịch vụ thật chưa được chạy trong quá trình soạn tài liệu này.</p>
 <blockquote>
 <p><strong>Chọn cách cài:</strong> có VPS/Docker → phần 2; quản lý bằng Portainer → phần 3; hosting có Node.js → phần 4; muốn dùng tên miền và HTTPS của Cloudflare mà không mở cổng vào VPS → phần 7. Cloudflare Tunnel vẫn cần máy chạy ứng dụng. Cloudflare Containers là hướng triển khai trực tiếp cần tích hợp thêm; Pages/Workers chưa chạy nguyên repo này.</p>
 </blockquote>
 <h3>Lấy đúng bản mã nguồn</h3>
-<p>Trong lúc PR #1 chưa được merge, giao diện tiếng Việt, logo URL và các file hướng dẫn mới nằm ở nhánh <code>codex/vietnamese-default-deployment-guide</code>. Các lệnh clone bên dưới lấy nhánh này. Sau khi merge vào <code>main</code>, có thể clone <code>main</code> cho bản chính thức. Trước khi cập nhật, kiểm tra <code>git branch --show-current</code> và <code>git log -1 --oneline</code>; không đổi nhánh trên bản chạy đang có thay đổi riêng chưa sao lưu.</p>
+<p>Giao diện mới và hướng dẫn cài đặt đã có trên nhánh <code>main</code>. Các lệnh clone bên dưới lấy bản chính thức này. Sao lưu cấu hình riêng trước khi cập nhật.</p>
 <h2 id="chuan-bi">1. Chuẩn bị chung</h2>
 <ul>
 <li>Tên miền giao diện, ví dụ <code>webmail.example.com</code>, trỏ đến máy chạy ứng dụng.</li>
@@ -73,7 +73,7 @@
 <p>Compose chỉ truyền các biến được khai báo trong <code>environment</code>; thêm biến vào <code>.env</code> chưa đủ nếu YAML không tham chiếu nó. Ngược lại, server Node nạp <code>.env</code> từ thư mục làm việc hoặc thư mục dự án và ưu tiên biến môi trường đã có. Frontend build với tiền tố cần <code>BASE_PATH=/mail npm run build</code>; không chỉ sửa <code>.env</code> ở thư mục gốc rồi mặc định Vite đã nhận.</p>
 <h2 id="docker">2. Docker riêng: build từ repo của bạn</h2>
 <p>Trên VPS Linux đã cài Docker Engine và Compose plugin:</p>
-<pre><code class="language-sh">git clone --branch codex/vietnamese-default-deployment-guide https://github.com/lehuunghi/webmail.git
+<pre><code class="language-sh">git clone --branch main https://github.com/lehuunghi/webmail.git
 cd webmail
 cp .env.example .env
 chmod 600 .env
@@ -136,7 +136,7 @@ docker compose up -d
 <li>Khi cập nhật, build lại trên host đúng hoặc push tag phiên bản mới. Đổi <code>WEBMAIL_IMAGE</code> sang tag mới trong stack rồi redeploy. Với image local giữ cùng tag, recreate container sau build; không chọn pull từ registry. Giữ volume và APP_SECRET.</li>
 </ol>
 <p>Có thể dùng Repository thay cho Web editor với <code>docker-compose.yml</code> nếu môi trường Portainer hỗ trợ build từ Git. Cách image đã build ở trên dễ kiểm tra hơn và không phụ thuộc hỗ trợ build của Portainer.</p>
-<p><a href="https://github.com/lehuunghi/webmail/blob/codex/vietnamese-default-deployment-guide/docker-compose.portainer.yml">Mở file YAML Portainer</a>. Trong bản HTML, nội dung hiện dưới đây để sao chép:</p>
+<p><a href="https://github.com/lehuunghi/webmail/blob/main/docker-compose.portainer.yml">Mở file YAML Portainer</a>. Trong bản HTML, nội dung hiện dưới đây để sao chép:</p>
 <pre><code class="language-yaml"># Build the image on the target Docker host first (see docs/CAI-DAT.md).
 # Portainer Web editor uses this stack without needing a source directory.
 services:
@@ -197,7 +197,7 @@ volumes:
 <h3>4.1 Tải và build</h3>
 <p>Dùng thư mục ngoài <code>public_html</code>, ví dụ <code>/home/CPANEL_USER/webmail</code>:</p>
 <pre><code class="language-sh">cd ~
-git clone --branch codex/vietnamese-default-deployment-guide https://github.com/lehuunghi/webmail.git
+git clone --branch main https://github.com/lehuunghi/webmail.git
 cd webmail
 node --version
 npm ci
@@ -368,7 +368,7 @@ APP_LOGO_URL=https://cdn.example.com/logo.png
 </code></pre>
 <p>Token cho phép chạy connector của tunnel; giữ file <code>.env</code> riêng, không đưa vào repo hoặc ảnh chụp. <a href="https://developers.cloudflare.com/tunnel/reference/tunnel-tokens/">Hướng dẫn token chính thức</a>.</p>
 <p><strong>Bước 3 — Khởi chạy:</strong> sử dụng <code>docker-compose.cloudflare.yml</code> trong repo:</p>
-<p><a href="https://github.com/lehuunghi/webmail/blob/codex/vietnamese-default-deployment-guide/docker-compose.cloudflare.yml">Mở file YAML Cloudflare</a>. Trong bản HTML, nội dung hiện dưới đây để sao chép:</p>
+<p><a href="https://github.com/lehuunghi/webmail/blob/main/docker-compose.cloudflare.yml">Mở file YAML Cloudflare</a>. Trong bản HTML, nội dung hiện dưới đây để sao chép:</p>
 <pre><code class="language-yaml"># Build lehuunghi/webmail:local on this host before starting this stack.
 # In Cloudflare, route webmail.example.com to http://webmail:8080.
 services:
@@ -464,4 +464,14 @@ docker compose start webmail
 <li>Trang <code>/huong-dan.html</code> truy cập trực tiếp; không nằm trên login hoặc menu tài khoản. Khi dùng BASE_PATH, thêm tiền tố vào URL trang này.</li>
 <li>Đã kiểm tra build/giao diện cục bộ. Docker, Portainer, cPanel và Cloudflare thật cần nghiệm thu trên môi trường của bạn; tài liệu không thay thế kết quả triển khai thực tế.</li>
 </ul>
+<h2>Cài đặt với INBUXA hoặc Stalwart</h2>
+<p>Webmail nhận diện cả <code>urn:stalwart:jmap</code> (Stalwart) và <code>urn:inbuxa:jmap:registry</code> (INBUXA), rồi dùng capability mà máy chủ công bố khi gửi các phương thức registry <code>x:</code>.</p>
+<p>Với máy chủ tại jmail.vn, cấu hình <strong>container Webmail hoặc ứng dụng Node.js cPanel</strong>:</p>
+<pre><code class="language-env">STALWART_URL=https://jmail.vn
+</code></pre>
+<p>Nếu máy chủ thư là <strong>INBUXA</strong>, thêm cấu hình sau vào môi trường của <strong>máy chủ/container INBUXA</strong> rồi khởi động lại INBUXA:</p>
+<pre><code class="language-env">INBUXA_HTTP_BASIC_AUTH=all
+</code></pre>
+<p>Không đặt <code>INBUXA_HTTP_BASIC_AUTH</code> trong container Webmail: biến này điều khiển xác thực HTTP Basic của INBUXA. Khi dùng Portainer, sửa Environment/Stack của dịch vụ INBUXA, không phải stack Webmail. Nếu INBUXA được quản lý bởi nhà cung cấp, yêu cầu nhà cung cấp bật cấu hình này.</p>
+<p>Sau khi khởi động lại máy chủ, mở Webmail và đăng nhập bằng tài khoản thư thật. Stalwart không cần biến INBUXA này; giữ cấu hình xác thực của Stalwart. Với máy chủ khác, đổi <code>STALWART_URL</code> thành URL gốc của máy chủ đó, không thêm <code>/jmap</code> hay <code>/.well-known/jmap</code>.</p>
 </article></main><footer>Hướng dẫn tiếng Việt · Đối chiếu ngày 02/10/2026 · Kiểm tra môi trường thật trước khi đưa vào sử dụng.</footer></body></html>
