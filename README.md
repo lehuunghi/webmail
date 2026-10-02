@@ -17,6 +17,8 @@ duy trì mã nguồn tại [lehuunghi/webmail](https://github.com/lehuunghi/webm
 
 Đọc [hướng dẫn tiếng Việt](docs/CAI-DAT.md) để cài bằng Docker, Portainer hoặc Node.js trên cPanel. Bản hướng dẫn trên trình duyệt nằm tại `/huong-dan.html`. Image `lehuunghi/webmail:local` được build từ chính repo này, không phải image có sẵn trên Docker Hub.
 
+Có hướng dẫn Cloudflare Tunnel và stack `docker-compose.cloudflare.yml` để chạy Webmail trên máy Docker riêng qua tên miền Cloudflare. Pages/Workers chưa chạy nguyên repo; Containers cần tích hợp Worker/Durable Object và xử lý lưu phiên trước khi triển khai trực tiếp.
+
 ## Chạy thử
 
 Yêu cầu Node.js theo `package.json` (CI của dự án gốc dùng Node.js 26).
