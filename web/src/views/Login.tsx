@@ -3,7 +3,6 @@ import { Eye, EyeOff } from "lucide-react";
 import { useSession } from "@/store/session";
 import { ApiError } from "@/jmap/client";
 import { withBase } from "@/lib/basePath";
-import { DEFAULT_SOURCE_URL } from "@/lib/source";
 import { DEFAULT_APP_NAME } from "@/lib/brand";
 import { t } from "@/lib/i18n";
 import { UI_LANGUAGES } from "@/lib/languages";
@@ -13,22 +12,6 @@ export function LoginPage() {
   const uiLanguage = useSettings((s) => s.settings.uiLanguage);
   const updateSettings = useSettings((s) => s.update);
   const login = useSession((s) => s.login);
-  // The AGPL's offer has to reach everyone who interacts with the app over the
-  // network, and that includes whoever is looking at this form. The server says
-  // where its own source lives, so a modified deployment points at its own.
-  const [sourceUrl, setSourceUrl] = useState(DEFAULT_SOURCE_URL);
-  /*
-   * What this instance calls itself.
-   *
-   * The name was in the `/api/config` answer all along and only `sourceUrl`
-   * was taken out of it, so an instance with `APP_NAME` set still said
-   * "ihasmail" on the one page a new user meets first -- the page where the
-   * name matters most, and the one the rebranding guide had to tell people to
-   * patch themselves.
-   *
-   * Defaults to ihasmail and stays there if the request fails, because a
-   * sign-in form with no name on it would be worse than a wrong one.
-   */
   const [appName, setAppName] = useState(DEFAULT_APP_NAME);
   useEffect(() => {
     let live = true;
@@ -36,7 +19,6 @@ export function LoginPage() {
       .then((r) => (r.ok ? r.json() : null))
       .then((c) => {
         if (!live || !c) return;
-        if (c.sourceUrl) setSourceUrl(c.sourceUrl as string);
         if (typeof c.appName === "string" && c.appName.trim()) setAppName(c.appName.trim());
       })
       .catch(() => { /* the default stands */ });
@@ -111,7 +93,6 @@ export function LoginPage() {
           <select id="login-language" aria-label={t("Interface language")} value={uiLanguage} onChange={(e) => updateSettings({ uiLanguage: e.target.value })}>
             {UI_LANGUAGES.map((language) => <option key={language.tag} value={language.tag} lang={language.tag}>{language.name}</option>)}
           </select>
-          <div><a href={withBase("/huong-dan.html")}>Hướng dẫn cài đặt</a><a href={sourceUrl} target="_blank" rel="noopener noreferrer">{t("AGPL-3.0 source")}</a></div>
         </footer>
       </div>
     </div>

@@ -15,7 +15,7 @@ duy trì mã nguồn tại [lehuunghi/webmail](https://github.com/lehuunghi/webm
 
 ## Hướng dẫn cài đặt bản riêng
 
-Đọc [hướng dẫn tiếng Việt](docs/CAI-DAT.md) để cài bằng Docker, Portainer hoặc Node.js trên cPanel. Bản chạy có liên kết **Hướng dẫn cài đặt** ở chân trang đăng nhập. Image `lehuunghi/webmail:local` được build từ chính repo này, không phải image có sẵn trên Docker Hub.
+Đọc [hướng dẫn tiếng Việt](docs/CAI-DAT.md) để cài bằng Docker, Portainer hoặc Node.js trên cPanel. Bản hướng dẫn trên trình duyệt nằm tại `/huong-dan.html`. Image `lehuunghi/webmail:local` được build từ chính repo này, không phải image có sẵn trên Docker Hub.
 
 ## Chạy thử
 
