@@ -1,3 +1,48 @@
+# Webmail — tiếng Việt và giao diện kiểu Gmail
+
+Bản tùy chỉnh của [Coffey-Labs/ihasmail](https://github.com/Coffey-Labs/ihasmail),
+duy trì mã nguồn tại [lehuunghi/webmail](https://github.com/lehuunghi/webmail).
+
+- **Tiếng Việt:** chọn **Tiếng Việt (Beta)** ngay ở màn hình đăng nhập, hoặc trong
+  **Settings → Appearance → Interface language**. Bản dịch gồm thư, lịch, danh bạ,
+  tệp, cài đặt và quyền quản trị. Beta cho đến khi được người bản ngữ duyệt.
+- **Giao diện Webmail:** nền sáng, thanh tìm kiếm bo tròn, nút Soạn thư xanh nhạt,
+  danh sách thư toàn chiều rộng, hỗ trợ cả chế độ tối và màn hình nhỏ.
+- Người dùng mới mặc định dùng chủ đề **Webmail**, chế độ sáng và ẩn ngăn đọc.
+  Tài khoản đã lưu cài đặt vẫn giữ lựa chọn cũ; vào **Settings → Appearance**
+  chọn **Webmail / Light**, và **General → Reading pane → Off** nếu muốn bố cục mới.
+- Ngôn ngữ tiếng Anh vẫn là mặc định và dự phòng; có thể chuyển ngôn ngữ bất cứ lúc nào.
+
+## Chạy thử
+
+Yêu cầu Node.js theo `package.json` (CI của dự án gốc dùng Node.js 26).
+
+```bash
+npm ci --ignore-scripts
+npm run dev:mock
+```
+
+Mở `http://localhost:5173`, dùng tài khoản mẫu **demo@example.com / demo**.
+Đây là dữ liệu giả để thử giao diện; không dùng mock cho hệ thống thật.
+
+## Triển khai với hộp thư thật
+
+Ứng dụng cần **Stalwart Mail Server 0.16 trở lên**, hỗ trợ JMAP. Giao diện kiểu
+Gmail không tự kết nối với dịch vụ Gmail của Google.
+
+```bash
+cp .env.example .env
+# Đặt STALWART_URL trỏ đến máy chủ Stalwart của bạn.
+# Tạo APP_SECRET riêng theo hướng dẫn trong .env.example.
+docker compose up --build -d
+```
+
+`APP_NAME` mặc định là `Webmail`; `SOURCE_URL` mặc định trỏ tới repo này.
+Giữ đường dẫn mã nguồn đúng với bản đang triển khai theo giấy phép AGPL-3.0-or-later.
+Hướng dẫn và ghi công của dự án gốc được giữ nguyên bên dưới.
+
+---
+
 <p align="center">
   <img src="web/public/img/logo.png" alt="ihasmail" width="150">
 </p>

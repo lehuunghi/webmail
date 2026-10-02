@@ -37,6 +37,7 @@ export interface UiLanguage {
 
 export const UI_LANGUAGES: readonly UiLanguage[] = [
   { tag: "en", name: "English" },
+  { tag: "vi", name: "Tiếng Việt", beta: true },
   { tag: "de", name: "Deutsch", beta: true },
   { tag: "es", name: "Español", beta: true },
   { tag: "fr", name: "Français", beta: true },
@@ -49,7 +50,7 @@ export const UI_LANGUAGES: readonly UiLanguage[] = [
 ];
 
 /** Where to report a bad translation. Beta languages depend on it. */
-export const TRANSLATION_ISSUE_URL = "https://git.coffeylabs.org/coffey-labs/ihasmail/issues/new?title=Translation%3A%20";
+export const TRANSLATION_ISSUE_URL = "https://github.com/lehuunghi/webmail/issues/new?title=Translation%3A%20";
 
 export const DEFAULT_UI_LANGUAGE = "en";
 

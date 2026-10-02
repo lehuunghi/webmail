@@ -14,7 +14,7 @@
  */
 
 export type PaletteId =
-  | "default" | "ihasmail" | "dracula" | "gruvbox" | "rose-pine" | "tokyo-night"
+  | "webmail" | "default" | "ihasmail" | "dracula" | "gruvbox" | "rose-pine" | "tokyo-night"
   | "catppuccin" | "solarized" | "ayu" | "kanagawa" | "everforest" | "primer";
 export type Mode = "system" | "light" | "dark";
 /** What a mode resolves to once the system has been asked. */
@@ -38,6 +38,7 @@ export interface PaletteMeta {
 }
 
 export const PALETTES: PaletteMeta[] = [
+  { id: "webmail", name: "Webmail" },
   { id: "default", name: "Classic", translatable: true },
   { id: "ihasmail", name: "ihasmail" },
   { id: "dracula", name: "Dracula", credit: "Dracula Theme (MIT) — dark: Dracula, light: Alucard" },
@@ -100,7 +101,7 @@ export function migrateTheme(theme: string | null | undefined): ThemeChoice {
     default:
       // Unknown, absent, or written by something newer: the default is what a
       // new account gets, and is never wrong in a way that hides mail.
-      return { palette: "ihasmail", mode: "dark" };
+      return { palette: "webmail", mode: "light" };
   }
 }
 

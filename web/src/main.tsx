@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles/app.css";
+import "./styles/webmail.css";
 import { App } from "./App";
 import { startBuildWatch } from "@/lib/sw/staleBuild";
 import { BASE_PATH, withBase } from "@/lib/basePath";

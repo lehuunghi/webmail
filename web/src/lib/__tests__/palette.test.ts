@@ -7,14 +7,14 @@ describe("the palettes themselves", () => {
     // no such palette. ihasmail's own gained a light half, and the override,
     // the toggle's memory and a grayed-out control all went with it.
     expect(PALETTES.map((p) => p.id)).toEqual([
-      "default", "ihasmail", "dracula", "gruvbox", "rose-pine", "tokyo-night",
+      "webmail", "default", "ihasmail", "dracula", "gruvbox", "rose-pine", "tokyo-night",
       "catppuccin", "solarized", "ayu", "kanagawa", "everforest", "primer",
     ]);
   });
 
   it("credits every borrowed palette and neither of ihasmail's own", () => {
     for (const p of PALETTES) {
-      if (p.id === "default" || p.id === "ihasmail") expect(p.credit).toBeUndefined();
+      if (p.id === "webmail" || p.id === "default" || p.id === "ihasmail") expect(p.credit).toBeUndefined();
       else expect(p.credit).toMatch(/MIT/);
     }
   });
@@ -48,7 +48,7 @@ describe("migrateTheme, which has to keep working indefinitely", () => {
   it("gives a new account what it would have got anyway", () => {
     // Absent, unknown, or written by something newer.
     for (const v of [undefined, null, "", "gruvbox-ish", "whatever"]) {
-      expect(migrateTheme(v)).toEqual({ palette: "ihasmail", mode: "dark" });
+      expect(migrateTheme(v)).toEqual({ palette: "webmail", mode: "light" });
     }
   });
 });

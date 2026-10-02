@@ -147,7 +147,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <MenuIcon size={22} />
         </button>
         <Link href="/mail" className="brand">
-          <img src={withBase("/img/logo.png")} alt="" />
+          <img src={withBase("/img/webmail.svg")} alt="" />
           {/* A product name, not a word: translated it is a different product.
               Read from the session rather than written here, so a deployment
               that set APP_NAME is called what it calls itself -- the document

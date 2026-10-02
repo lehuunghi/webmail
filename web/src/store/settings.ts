@@ -308,22 +308,16 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  /**
-   * ihasmail's own palette is what a new account gets, so the app looks like
-   * itself before anyone has chosen anything. It is only a default: a stored
-   * theme always wins, so nobody who has picked one — including everyone
-   * already using ihasmail, whose choice is saved even if they never changed
-   * it — is moved off it.
-   */
-  theme: "ihasmail",
-  palette: "ihasmail",
-  mode: "dark",
-  accent: "teal",
+  // Defaults for this fork. Stored account preferences still take precedence.
+  theme: "light",
+  palette: "webmail",
+  mode: "light",
+  accent: "blue",
   density: "cozy",
-  readingPane: "right",
+  readingPane: "off",
   conversationMode: true,
   showPreview: true,
-  showAvatars: true,
+  showAvatars: false,
   pageSize: 50,
   markReadDelay: 0,
   addedShares: [],

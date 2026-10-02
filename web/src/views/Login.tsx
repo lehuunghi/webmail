@@ -7,8 +7,12 @@ import { DEFAULT_SOURCE_URL } from "@/lib/source";
 import { APP_VERSION } from "@/lib/version";
 import { DEFAULT_APP_NAME } from "@/lib/brand";
 import { t } from "@/lib/i18n";
+import { UI_LANGUAGES } from "@/lib/languages";
+import { useSettings } from "@/store/settings";
 
 export function LoginPage() {
+  const uiLanguage = useSettings((s) => s.settings.uiLanguage);
+  const updateSettings = useSettings((s) => s.update);
   const login = useSession((s) => s.login);
   // The AGPL's offer has to reach everyone who interacts with the app over the
   // network, and that includes whoever is looking at this form. The server says
@@ -72,11 +76,17 @@ export function LoginPage() {
     <div className="login-page">
       <form className="login-card" onSubmit={submit}>
         <div className="logo">
-          <img src={withBase("/img/logo.png")} alt="" width={120} height={143} />
+          <img src={withBase("/img/webmail.svg")} alt="" width={80} height={80} />
           {/* A product name, not a word: not translated, and not guessed at
               from the page it is on. */}
           <h1 className="notranslate" translate="no">{appName}</h1>
           <p className="tagline">{t("Fast, friendly webmail. Your mailbox, your way.")}</p>
+        </div>
+        <div className="field">
+          <label htmlFor="login-language">{t("Interface language")}</label>
+          <select id="login-language" className="input" value={uiLanguage} onChange={(e) => updateSettings({ uiLanguage: e.target.value })}>
+            {UI_LANGUAGES.map((language) => <option key={language.tag} value={language.tag} lang={language.tag}>{language.name}{language.beta ? " (Beta)" : ""}</option>)}
+          </select>
         </div>
         {error && (
           <div className="error-box mb-16" role="alert">
@@ -102,12 +112,12 @@ export function LoginPage() {
         </label>
         <p className="hint" style={{ marginBottom: 12 }}>
           {trustDevice
-            ? "Stay signed in, and keep settings and recent addresses on this computer."
-            : "Signed out after 5 minutes of inactivity, and nothing is kept on this computer. Leave this unticked on a shared or public one."}
+            ? t("Stay signed in, and keep settings and recent addresses on this computer.")
+            : t("Signed out after 5 minutes of inactivity, and nothing is kept on this computer. Leave this unticked on a shared or public one.")}
         </p>
         <button className="btn btn-primary btn-lg btn-block" type="submit" disabled={busy}>
           {busy ? <span className="spinner" style={{ borderTopColor: "#fff" }} /> : <LogIn size={18} />}
-          {busy ? "Signing in…" : "Sign in"}
+          {busy ? t("Signing in…") : t("Sign in")}
         </button>
         <p className="foot">
           {/*

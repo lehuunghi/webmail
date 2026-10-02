@@ -37,8 +37,10 @@ describe("which themes paint dark", () => {
 });
 
 describe("the default theme", () => {
-  it("is ihasmail, so a new account looks like ihasmail before anyone chooses", () => {
-    expect(DEFAULT_SETTINGS.theme).toBe("ihasmail");
+  it("uses the light Webmail palette for a new account", () => {
+    expect(DEFAULT_SETTINGS.theme).toBe("light");
+    expect(DEFAULT_SETTINGS.palette).toBe("webmail");
+    expect(DEFAULT_SETTINGS.mode).toBe("light");
   });
 
   /**
@@ -92,7 +94,7 @@ describe("the default theme", () => {
 
   it("falls back to the default when nothing is stored", () => {
     withStorage(() => {
-      expect(loadJson("theme-test-absent", DEFAULT_SETTINGS).theme).toBe("ihasmail");
+      expect(loadJson("theme-test-absent", DEFAULT_SETTINGS).theme).toBe("light");
     });
   });
 });

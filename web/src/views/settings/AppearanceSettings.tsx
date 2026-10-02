@@ -14,6 +14,7 @@ import { isEnforced } from "@/lib/settingsPolicy";
  * three places.
  */
 const PALETTE_PREVIEW: Record<PaletteId, { light: string; dark: string }> = {
+  webmail: { light: "linear-gradient(135deg,#f6f8fc 0%,#ffffff 55%,#c2e7ff 55%,#c2e7ff 78%,#0b57d0 78%)", dark: "linear-gradient(135deg,#202124 0%,#292a2d 55%,#004a77 55%,#004a77 78%,#a8c7fa 78%)" },
   default: { light: "#f6f8fa", dark: "#0b1220" },
   // The ihasmail.org palette: its background, with its teal and the logo's
   // orange showing.
