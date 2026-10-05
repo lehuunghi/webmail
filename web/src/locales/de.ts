@@ -832,24 +832,24 @@ export const catalog: Catalog = {
     "Invalid settings file": "Ungültige Einstellungsdatei",
     "Reset to defaults": "Auf Standard zurücksetzen",
     "Default mail app": "Standard-E-Mail-Programm",
-    "Documentation": "Dokumentation",
-    "About {app}": "Über {app}",
-    "Server": "Server",
-    "Server capabilities": "Server-Funktionen",
+    
+    
+    
+    
     "Accounts": "Konten",
     "Account": "Konto",
-    "Max upload": "Maximaler Upload",
-    "{size} MB": "{size} MB",
+    
+    
     "KB": "KB",
-    "Image privacy proxy": "Bild-Datenschutz-Proxy",
-    "enabled": "aktiviert",
+    
+    
     "disabled": "deaktiviert",
     "Enabled": "Aktiviert",
     "active": "aktiv",
     "hidden": "ausgeblendet",
     "connected": "verbunden",
     "reconnecting…": "Verbindung wird wiederhergestellt…",
-    "AGPL-3.0 source": "AGPL-3.0-Quellcode",
+    
 
     // ── Identities, templates, filters ─────────────────────────────────
     "Identities & signatures": "Identitäten & Signaturen",
@@ -932,7 +932,7 @@ export const catalog: Catalog = {
     "Sign out": "Abmelden",
     "Sign out here": "Hier abmelden",
     "Sign out all other sessions": "Alle anderen Sitzungen abmelden",
-    "Signed in as": "Angemeldet als",
+    
     "This is my own device": "Das ist mein eigenes Gerät",
     "this device": "dieses Gerät",
     "Device": "Gerät",
@@ -946,7 +946,7 @@ export const catalog: Catalog = {
     "Type": "Typ",
     "Email or username": "E-Mail oder Benutzername",
     "Use your usual address as the username.": "Verwenden Sie Ihre gewohnte Adresse als Benutzernamen.",
-    "Fast, friendly webmail. Your mailbox, your way.": "Schnelle, freundliche Webmail. Ihr Postfach, wie Sie es wollen.",
+    
 
     "Notifications": "Benachrichtigungen",
     "Notifications are blocked in your browser settings.": "Benachrichtigungen sind in Ihren Browsereinstellungen blockiert.",
@@ -991,7 +991,7 @@ export const catalog: Catalog = {
     "Keyboard shortcuts": "Tastenkürzel",
     "Keyboard shortcuts (?)": "Tastenkürzel (?)",
     "Shortcuts": "Kürzel",
-    "Go to": "Gehe zu",
+    
     "Menu": "Menü",
     "Close menu": "Menü schließen",
     "Options": "Optionen",
@@ -1051,14 +1051,14 @@ export const catalog: Catalog = {
     "Choose a date": "Datum wählen",
     "Choose a date and time": "Datum und Uhrzeit wählen",
     "Pick date and time…": "Datum und Uhrzeit wählen…",
-    "Search mail  (from:, to:, subject:, has:attachment, is:unread, in:, before:, after:)": "E-Mail durchsuchen  (from:, to:, subject:, has:attachment, is:unread, in:, before:, after:)",
+    
     "Settings → Filters & rules": "Einstellungen → Filter & Regeln",
     "Open the Mail view to see all shortcuts.": "Öffnen Sie die E-Mail-Ansicht, um alle Tastenkürzel zu sehen.",
     "Gmail-style shortcuts are always on. Press {key} anywhere to see this list.": "Tastenkürzel im Gmail-Stil sind immer aktiv. Drücken Sie überall {key}, um diese Liste zu sehen.",
     "Select a conversation to read it here · Press {key} for shortcuts": "Wählen Sie eine Konversation, um sie hier zu lesen · {key} für Tastenkürzel",
     "Select a message to read it here · Press {key} for shortcuts": "Wählen Sie eine Nachricht, um sie hier zu lesen · {key} für Tastenkürzel",
     "Tip: press {key} on a conversation to apply labels. Search with {operator}.": "Tipp: Drücken Sie {key} auf einer Konversation, um Labels zu vergeben. Suchen Sie mit {operator}.",
-    "A fast, friendly, open-source webmail for {server}, built on JMAP.": "Eine schnelle, freundliche Open-Source-Webmail für {server}, auf JMAP aufgebaut.",
+    
     "Defaults for the calendar views and new events.": "Vorgaben für die Kalenderansichten und neue Termine.",
     "Replies will go to this address instead of the From address": "Antworten gehen an diese Adresse statt an die Absenderadresse",
     "Replies to mail sent from this identity go here instead of the From address.": "Antworten auf Nachrichten von dieser Identität gehen hierhin statt an die Absenderadresse.",
@@ -1089,7 +1089,7 @@ export const catalog: Catalog = {
     "A separate password for a mail app or device, which you can revoke on its own. App passwords skip two-factor codes, so they keep working in apps that can't ask for one.": "Ein eigenes Passwort für ein E-Mail-Programm oder Gerät, das Sie einzeln widerrufen können. App-Passwörter umgehen Zwei-Faktor-Codes und funktionieren daher auch in Programmen, die keinen abfragen können.",
     "Copy it into {name} now — it isn't shown again.": "Übertragen Sie es jetzt nach {name} — es wird nicht erneut angezeigt.",
     "No other users found in the directory, so nobody new can be added. Sharing already in place is listed below and can still be removed.": "Im Verzeichnis wurden keine weiteren Benutzer gefunden, es kann also niemand Neues hinzugefügt werden. Bestehende Freigaben sind unten aufgeführt und können weiterhin entfernt werden.",
-    "Stalwart does not publish its version number to mail clients, so {app} reports the edition where the server gives one. {app} requires 0.16 or newer, and sign-in refuses anything older.": "Stalwart gibt seine Versionsnummer nicht an E-Mail-Programme weiter, daher nennt {app} die Edition, sofern der Server eine angibt. {app} ben\u00f6tigt 0.16 oder neuer; die Anmeldung verweigert \u00e4ltere Versionen.",
+    
     "It {damage}, so the rules in it can't be shown or edited — saving what did arrive would write it back over the rest. Reload the page to try again. Your rules are still on the server; nothing here has changed them.": "Es {damage}, daher können die enthaltenen Regeln weder angezeigt noch bearbeitet werden — das Speichern des angekommenen Teils würde den Rest überschreiben. Laden Sie die Seite neu und versuchen Sie es erneut. Ihre Regeln liegen weiterhin auf dem Server; hier wurde nichts daran geändert.",
     "The visual rule editor only manages scripts it created. You can edit the script in the {tab} tab, or start fresh with rules (the existing script will be kept but deactivated).": "Der visuelle Regeleditor verwaltet nur Skripte, die er selbst erstellt hat. Sie können das Skript im Reiter {tab} bearbeiten oder neu mit Regeln beginnen (das vorhandene Skript bleibt erhalten, wird aber deaktiviert).",
     "Your filter script {damage}, so only part of it arrived. Adding a rule would write that part back over the whole thing. Reload the page and try again.": "Ihr Filterskript {damage}, daher ist nur ein Teil angekommen. Eine Regel hinzuzufügen würde diesen Teil über das Ganze schreiben. Laden Sie die Seite neu und versuchen Sie es erneut.",
@@ -1100,7 +1100,7 @@ export const catalog: Catalog = {
     // ── Labels defined as constants, translated where they render ──────
     // The catalogue checker cannot see these: they reach t() as a variable,
     // so there is no string literal for it to find. Listed here deliberately.
-    "About": "Über",
+    
     "Add": "Hinzufügen",
     "Add files": "Dateien hinzufügen",
     "Automatic": "Automatisch",
@@ -1139,7 +1139,7 @@ export const catalog: Catalog = {
     "Drop here for the top level": "Hierher ziehen für die oberste Ebene",
 
     // ── Remaining prose ────────────────────────────────────────────────
-    "{app}'s own version is the date of the commit it was built from, followed by where that commit came from: {example} was built from a commit dated the 30th of August 2026 that arrived through pull request 129. A commit that did not come through one carries its short SHA instead \u2014 {sha}. The version deliberately says nothing about Stalwart; what this build needs from the server is the line above.": "Die Version von {app} ist das Datum des Commits, aus dem es gebaut wurde, gefolgt davon, woher dieser Commit stammt: {example} wurde aus einem Commit vom 30. August 2026 gebaut, der \u00fcber Pull Request 129 kam. Ein Commit, der nicht \u00fcber einen solchen kam, tr\u00e4gt stattdessen seinen kurzen SHA \u2014 {sha}. Die Version sagt bewusst nichts \u00fcber Stalwart aus; was dieser Build vom Server ben\u00f6tigt, steht in der Zeile dar\u00fcber.",
+    
 
     // ── Weekdays, schedule presets, rule operators ─────────────────────
     // Header names (List-Id, X-Spam-Status) stay English: they are the actual
@@ -1496,7 +1496,7 @@ export const catalog: Catalog = {
     "Forward as attachment": "Als Anhang weiterleiten",
     "From the birthdays on your contacts. Nothing is stored.": "Aus den Geburtstagen Ihrer Kontakte. Es wird nichts gespeichert.",
     "Import iCAL file…": "iCAL-Datei importieren…",
-    "Labels are IMAP keywords stored on your messages, so every other client sees them. Names, colors and nesting are ihasmail’s own and follow your account. Nesting is display only — it rewrites nothing in the mailbox.": "Label sind IMAP-Keywords, die auf Ihren Nachrichten gespeichert werden, sodass jeder andere Client sie sieht. Namen, Farben und Verschachtelung gehören Webmail selbst und folgen Ihrem Konto. Die Verschachtelung dient nur der Anzeige — sie schreibt im Postfach nichts um.",
+    
     "Largest first": "Größte zuerst",
     "Later": "Später",
     "Light or dark": "Hell oder dunkel",

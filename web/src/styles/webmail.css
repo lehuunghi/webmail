@@ -139,3 +139,8 @@
   :root[data-palette="webmail"] .mobile-tabbar a { font-size: 12px; font-weight: 500; color: var(--fg); gap: 3px; }
   :root[data-palette="webmail"] .mobile-tabbar a.active { color: var(--accent); font-weight: 600; }
 }
+
+.login-mode-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+.login-mode-tabs [aria-pressed="true"] { background:var(--accent); color:white; }
+.qr-login-panel { display:flex; flex-direction:column; gap:12px; align-items:center; text-align:center; }
+.qr-login-panel p { margin:0; }
