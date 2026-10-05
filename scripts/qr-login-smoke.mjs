@@ -7,7 +7,7 @@ mkdirSync("ui-smoke", { recursive: true });
 const children = [];
 let browser;
 const start = (args, env) => { const child = spawn(process.execPath, args, { env: { ...process.env, ...env }, stdio: ["ignore", "pipe", "pipe"] }); let log = ""; child.stdout.on("data", (s) => log += s); child.stderr.on("data", (s) => log += s); children.push({ child, log: () => log }); };
-async function ready(url) { for (let i = 0; i < 60; i++) { try { if ((await fetch(url)).ok) return; } catch {} await new Promise((r) => setTimeout(r, 500)); } throw new Error("Test fixture unavailable"); }
+async function ready(url) { for (let i = 0; i < 60; i++) { try { const response = await fetch(url); if (response.ok || response.status === 401) return; } catch {} await new Promise((r) => setTimeout(r, 500)); } throw new Error("Test fixture unavailable: " + url); }
 try {
   start(["--import", "tsx", "server/src/mock/index.ts"], { MOCK_USER: "demo", MOCK_PASS: "demo" });
   await ready("http://127.0.0.1:8788/.well-known/jmap");
