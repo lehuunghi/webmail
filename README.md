@@ -13,6 +13,12 @@ duy trì mã nguồn tại [lehuunghi/webmail](https://github.com/lehuunghi/webm
   chọn **Webmail / Light**, và **General → Reading pane → Off** nếu muốn bố cục mới.
 - Ngôn ngữ tiếng Anh là dự phòng khi thiếu bản dịch; có thể chuyển ngôn ngữ bất cứ lúc nào.
 
+## Container tự động trên GHCR
+
+Workflow tự build khi cập nhật `main` hoặc tạo tag `v*`, rồi đẩy image
+`ghcr.io/lehuunghi/webmail` cho AMD64 và ARM64. Xem [hướng dẫn GHCR](docs/GHCR.md).
+
+
 ## Hướng dẫn cài đặt bản riêng
 
 Đọc [hướng dẫn tiếng Việt](docs/CAI-DAT.md) để cài bằng Docker, Portainer hoặc Node.js trên cPanel. Bản hướng dẫn trên trình duyệt nằm tại `/huong-dan.html`. Image `lehuunghi/webmail:local` được build từ chính repo này, không phải image có sẵn trên Docker Hub.
